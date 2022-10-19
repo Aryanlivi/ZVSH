@@ -2,6 +2,7 @@ import {Client,Room} from "colyseus.js";
 class User{
     client:Client;
     room:Room;
+    id:string;
     constructor(){
         this.client=new Client("ws://localhost:2567");
     }
@@ -9,8 +10,8 @@ class User{
         console.log("Joining Room...");
         try{
             this.room=await this.client.joinOrCreate("my_room");
-            console.log("Joined Successfully!");
-            
+            this.id=this.room.sessionId;
+            console.log(this.id+" Joined Successfully!");
         }catch(e){
             console.log("Error joining!\n");
             console.log(e);           

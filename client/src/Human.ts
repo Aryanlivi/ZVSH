@@ -15,7 +15,7 @@ const TEXTURE_KEY="human";
 export default class Human extends Player{
     private static readonly walkSpeed:number=1.0; 
     state:HumanState;
-    constructor(scene:Phaser.Scene,x:number,y:number,title:string,alive:Boolean,id:number,state:HumanState){
+    constructor(scene:Phaser.Scene,x:number,y:number,title:string,alive:Boolean,id:string,state:HumanState){
         super(scene,x,y,TEXTURE_KEY,title,alive,id);
         this.state=state;
     }
@@ -23,6 +23,9 @@ export default class Human extends Player{
         this.scene.add.existing(this);
         this.play("running");
         console.log("Human added to scene!");
+    }
+    removeFromScene(){
+        this.destroy();
     }
     update(x:number,y:number,alive:Boolean,state:HumanState){
         this.x=x;

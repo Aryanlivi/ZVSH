@@ -2,23 +2,24 @@ import  Human  from "./Human";
 import {Scene} from "phaser";
 import {user} from "./services/User";
 import Player from "./Player";
-import { Schema,ArraySchema ,Context, type } from "@colyseus/schema";
+import Zombie  from "./Zombie";
+import {MapSchema } from "@colyseus/schema";
 
 export default class GameScene extends Scene{
     player:Player;
-    const listOfPlayers:[];
+    id:string;
+    listOfPlayers:Map<string,Player>=new Map();
     constructor(){
         super('GameScene_Key');
     }
 
-    preload(){
-        user.room.send("GameScene");
-    } 
+    preload(){} 
     
     create ()
     {
         this.initMockup();
-        this.handleMsg();
+        this.getId();
+        this.handler();
     }
 
     initMockup(){
@@ -38,20 +39,31 @@ export default class GameScene extends Scene{
 
     handler()
     {
-        const players:ArraySchema=user.room.state.players;
+        const players:MapSchema=user.room.state.players;
         players.onAdd=(item,key)=>{
-            this.player=new Human(this,e.posX,e.posY,e.title,e.alive,e.id,e.state);
-            this.player.addToScene();
-            const human=new Human(this,item.posX,item.posY,item.title,item.alive,item.id,item.state);
-            this.listOfPlayers[item.id]=human;     
+            console.log("Player added");
+            const human=new Human(this,item.x,item.y,item.title,item.alive,item.id,item.state);
+            this.listOfPlayers.set(item.id,human);
+            this.listOfPlayers.get(item.id)?.addToScene();
+            console.log(this.listOfPlayers);
         };
-        //players.onRemove=(item,key)=>{};
+        players.onRemove=(item,key)=>{
+            console.log(item.id);
+            const a=this.listOfPlayers.get(item.id);
+            console.log(a+"Removed")
+        };
         players.onChange=(item,key)=>{
-            const id=item.id;
-            Player p=this.listOfPlayers[id];
+            console.log("updated")
+            const p:Player=this.listOfPlayers[item.id];
             p.x=item.x;
             p.y=item.y;
+            p.alive=item.alive;
+            p.state=item.state;
         };
+        //p.update(item.x,item.y,item.alive,item.state);
+    }
+    getId(){
+        console.log(user.id);
     }
     /*
     handleMsg(){
@@ -79,5 +91,4 @@ export default class GameScene extends Scene{
         console.log("Zombie created!");
     }
     */
-    
 }
