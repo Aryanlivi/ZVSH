@@ -1,5 +1,7 @@
 import {Scene} from "phaser";
 import {user} from "./services/User";
+
+export let isAssigned:boolean=false;
 export default class PreloadScene extends Scene{
     constructor(){
         super('PreloadScene_Key');
@@ -38,19 +40,22 @@ export default class PreloadScene extends Scene{
         });
         if(await user.join()){
             this.choosePlayer();
-            this.scene.start("GameScene_Key");
         }
     }
     choosePlayer(){
         let human_btn=document.getElementById("human-btn");
+        let zombie_btn=document.getElementById("zombie-btn");
         human_btn?.addEventListener("click",()=>{
             user.room.send("Assign-Human");
             human_btn?.setAttribute("disabled","disabled");
+            zombie_btn?.setAttribute("disabled","disabled");
+            this.scene.start("GameScene_Key");
         })
-        let zombie_btn=document.getElementById("zombie-btn");
         zombie_btn?.addEventListener("click",()=>{
             user.room.send("Assign-Zombie");
+            human_btn?.setAttribute("disabled","disabled");
             zombie_btn?.setAttribute("disabled","disabled");
+            this.scene.start("GameScene_Key");
         });
     }
     

@@ -1,6 +1,7 @@
 import { Room, Client, Deferred } from "colyseus";
 import MyRoomState from "./schema/MyRoomState";
 import { Human,HumanState} from "../Human";
+import Player from "../Player";
 
 export class MyRoom extends Room<MyRoomState>{
 
@@ -10,13 +11,13 @@ export class MyRoom extends Room<MyRoomState>{
 
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
-    this.assignPlayer();  
+    this.assignPlayer();
     this.onMessage("Pointer-Down",(client,mouseclick)=>{
-      const player=this.state.players.get(client.id)
-      player.x=mouseclick.x;
-      player.y=mouseclick.y;
-        //this.broadcast("update_human",e);
-
+      const player=this.state.players.get(client.id);
+      player.assign({
+        x:mouseclick.x,
+        y:mouseclick.y
+      })
     })
   }
   assignPlayer(){
@@ -40,28 +41,6 @@ export class MyRoom extends Room<MyRoomState>{
     })
     */
   }
-
-/*
-  updateHuman(){
-      if(this.state.players.length>0){
-        for(let i=0;i<this.state.players.length;i++){
-          console.log("hey")
-          this.broadcast("create_human",this.state.players[i]);
-        }   
-      }
-      this.onMessage("Pointer-Down",(client,mouseclick)=>{
-        this.state.players.forEach((e)=>{
-          if(e.id==client.id){
-            console.log(e.id);
-            e.posX=mouseclick.x;
-            e.posY=mouseclick.y;
-          }
-          this.broadcast("update_human",e);
-        })
-      })
-    }
-*/
-
     onLeave (client: Client, consented: boolean) {
       console.log(client.sessionId, "left!");
       this.state.players.delete(client.id)
