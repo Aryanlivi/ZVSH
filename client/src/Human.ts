@@ -21,6 +21,7 @@ export default class Human extends Player{
         this.state=state;
     }
     addToScene(){
+        this.inScene=true;
         this.addTitle();
         this.scene.add.existing(this);
         this.play("running");
@@ -30,8 +31,9 @@ export default class Human extends Player{
         this.circle=this.scene.add.graphics();
         this.circle.lineStyle(2, 0xff0000,1);
         var radius = 2;
-        let a=this.getCenter();
-        this.circle.strokeCircle(a.x, a.y, radius);
+        const topCenter=this.getTopCenter();
+        const offsetY=35;
+        this.circle.strokeCircle(topCenter.x, topCenter.y+offsetY, radius);
     }
     removeFromScene(){
         this.destroy();

@@ -94,7 +94,9 @@ export default class GameScene extends Scene{
                 }
             })
             this.listOfPlayers.forEach((e)=>{
-                e.addToScene();
+                if(!e.inScene){
+                    e.addToScene();
+                } 
             })
         }
         this.movePlayer(delta);
