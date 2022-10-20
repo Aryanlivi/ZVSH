@@ -95,6 +95,12 @@ export default class GameScene extends Scene{
             })
             this.listOfPlayers.forEach((e)=>{
                 if(!e.inScene){
+                    if(e.id==user.id){
+                        e.healthBarTextureKey='green_healthbar';
+                    }
+                    else{
+                        e.healthBarTextureKey='red_healthbar'
+                    }
                     e.addToScene();
                 } 
             })
@@ -105,7 +111,8 @@ export default class GameScene extends Scene{
         players.onRemove=(item,key)=>{
             // ! at the end helps in removing null or undefined
             const player:Player=this.listOfPlayers.get(item.id)!;
-            player.destroy();
+            this.listOfPlayers.delete(item.id);
+            player.destroyAll();
             console.log(player+"Removed");
         }
     }
@@ -119,8 +126,8 @@ export default class GameScene extends Scene{
             player.y=Phaser.Math.Linear(player.y,updates.y,step*delta);
             player.title=updates.title;
             player.alive=updates.alive;
-            player.circle.destroy();
-            player.addcircle();
+            player.healthBarObj.destroy();
+            player.addHealthBar();
             player.titleObj.destroy();
             player.addTitle();
         }   

@@ -30,7 +30,8 @@ export class MyRoom extends Room<MyRoomState>{
           alive:true,
           id:client.id,
           x:200,
-          y:200
+          y:200,
+          healthBarObj:'my_healthBar'
         });
         this.state.players.set(client.id,human);
     })

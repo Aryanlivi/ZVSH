@@ -8,6 +8,8 @@ export default class PreloadScene extends Scene{
     }
     preload(){
         this.load.image('mockup',require('./assets/mockup.png'));
+        this.load.image('green_healthbar',require('./assets/zvh_healthBarHealthy.png'));
+        this.load.image('red_healthbar',require('./assets/zvh_healthBarUnhealthy.png'));
         this.load.image('gift',require('./assets/gift.png'));
         this.load.spritesheet({
             key: 'human',
