@@ -6,6 +6,7 @@ export default class Zombie extends Player{
     removeFromScene(){
         this.destroy();
     }
+    addcircle(){};
     update(){
         console.log("Updated Zombie")
     }

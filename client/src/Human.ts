@@ -1,7 +1,8 @@
 import Player from "./Player";
-import Scene, { Game } from "phaser";
+import Phaser,{Scene} from "phaser";
 import GameScene from "./GameScene";
 import { stat } from "fs";
+import { Grid } from "matter";
 
 //------Human States:
 export enum HumanState{
@@ -20,9 +21,17 @@ export default class Human extends Player{
         this.state=state;
     }
     addToScene(){
+        this.addTitle();
         this.scene.add.existing(this);
         this.play("running");
         console.log("Human added to scene!");
+    }
+    addcircle(){
+        this.circle=this.scene.add.graphics();
+        this.circle.lineStyle(2, 0xff0000,1);
+        var radius = 2;
+        let a=this.getCenter();
+        this.circle.strokeCircle(a.x, a.y, radius);
     }
     removeFromScene(){
         this.destroy();

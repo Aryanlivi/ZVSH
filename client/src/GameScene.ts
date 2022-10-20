@@ -4,8 +4,24 @@ import {user} from "./services/User";
 import Player from "./Player";
 import Zombie  from "./Zombie";
 import {MapSchema } from "@colyseus/schema";
-import { it } from "node:test";
+import { ChangeOperation } from "@colyseus/schema/lib/changes/ChangeTree";
 
+
+//let tempid:string="";
+type ChangeObj={
+    x:number,
+    y:number,
+    title:string,
+    id:string,
+    alive:boolean
+};
+let updates:ChangeObj={
+    x:0,
+    y:0,
+    title:"",
+    id:"",
+    alive:true
+};
 export default class GameScene extends Scene{
     player:Player;
     id:string;
@@ -19,10 +35,11 @@ export default class GameScene extends Scene{
     create ()
     {
         this.initMockup();
-        //this.getId();
-        this.handleChanges();
+        
     }
-
+    update(time: number, delta: number): void {
+        this.handleChanges(delta);
+    }
     initMockup(){
         const mockup=this.add.image(0,0,'mockup').setOrigin(0,0);
         mockup.setInteractive();
@@ -32,13 +49,14 @@ export default class GameScene extends Scene{
                     x:this.game.input.mousePointer.x,
                     y:this.game.input.mousePointer.y
                 }
-                console.log("X:"+mouseclick.x+"\t Y:"+mouseclick.y);
+                //console.log("X:"+mouseclick.x+"\t Y:"+mouseclick.y);
                 user.room.send("Pointer-Down",mouseclick);  
             }
         })
     }
-    handleChanges()
-    {
+    
+    handleChanges(delta:number)
+    { 
         const players:MapSchema=user.room.state.players;
         players.onAdd=(item,key)=>{
 
@@ -52,70 +70,85 @@ export default class GameScene extends Scene{
                 ////////////
                 e.onChange=(changes)=>{
                     changes.forEach((change)=>{
-                        const player=this.listOfPlayers.get(e.id)!;
-                        if(change.field=="x"){
-                            player.x=change.value;
-                        }
-                        if(change.field=="y"){
-                            player.y=change.value;
+                        updates.id=e.id;
+                        if(change.field=="alive"){
+                            updates.alive=change.value;
                         }
                         if(change.field=="title"){
-                            player.title=change.value;
+                            updates.title=change.value;
                         }
-                        if(change.field=="alive"){
-                            player.alive=change.value;
-                        }
+                        
                         if(change.field=="id"){
-                            player.id=change.value;
+                            updates.id=change.value;
+                        }
+                        
+                        if(change.field=="x"){
+                            updates.x=change.value;
+                        }
+                        
+                        if(change.field=="y"){
+                            updates.y=change.value;
                         }
                     })
+                    this.findDirection();
                 }
             })
-
-            ///////////////
             this.listOfPlayers.forEach((e)=>{
                 e.addToScene();
             })
-
-            
         }
+        this.movePlayer(delta);
 
         ////////////////////
         players.onRemove=(item,key)=>{
-            console.log(item.id);
             // ! at the end helps in removing null or undefined
             const player:Player=this.listOfPlayers.get(item.id)!;
             player.destroy();
             console.log(player+"Removed");
         }
     }
-    getId(){
-        console.log(user.id);
+
+    movePlayer(delta:number){
+        if(this.listOfPlayers.has(updates.id)){
+            const player=this.listOfPlayers.get(updates.id)!;
+            player.id=updates.id;
+            const step=0.004;
+            player.x=Phaser.Math.Linear(player.x,updates.x,step*delta);
+            player.y=Phaser.Math.Linear(player.y,updates.y,step*delta);
+            player.title=updates.title;
+            player.alive=updates.alive;
+            player.circle.destroy();
+            player.addcircle();
+            player.titleObj.destroy();
+            player.addTitle();
+        }   
     }
-    /*
-    handleMsg(){
-        user.room.onMessage("Assign_Human",(e)=>{
-            this.player=new Human(this,e.posX,e.posY,e.title,e.alive,e.id,e.state);
-            this.player.addToScene();
-        })
-        user.room.onMessage("create_human",(e)=>{
-            console.log(e);
-            this.createHuman(e);
-        });
-        user.room.onMessage("create_zombie",(e)=>{
-            this.createZombie(e);
-        });
-        user.room.onMessage("update_human",(e)=>{
-            this.player.update(e.posX,e.posY,e.alive,e.state);
-        })
+    
+    findDirection(){
+        const player=this.listOfPlayers.get(updates.id)!;
+        if(updates.x>player.x){
+            console.log("Right"+"newx:"+updates.x+"\t oldx:"+player.x);
+            if(updates.y>player.y){
+                console.log("Right Down");
+            }
+            if(updates.y<player.y){
+                console.log("Right Up");
+            }
+        }
+        if(updates.x<player.x){
+            console.log("Left");
+            if(updates.y>player.y){
+                console.log("Left Down");
+            }
+            if(updates.y<player.y){
+                console.log("Left Up");
+            }
+        }
+        if(updates.y>player.y){
+            console.log("Down");
+        }
+        if(updates.y<player.y){
+            console.log("Up");
+        }
     }
-    createHuman(e){
-        console.log("Human created!");
-        const player=new Human(this,e.posX,e.posY,e.title,e.alive,e.id,e.state);
-        player.addToScene();
-    }
-    createZombie(e){
-        console.log("Zombie created!");
-    }
-    */
 }
