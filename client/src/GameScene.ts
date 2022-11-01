@@ -25,6 +25,7 @@ export default class GameScene extends Scene{
     player:Player;
     id:string;
     listOfPlayers:Map<string,Player>=new Map();
+    listOfUpdates:Map<string,ChangeObj>=new Map();
     constructor(){
         super('GameScene_Key');
     }
@@ -35,9 +36,6 @@ export default class GameScene extends Scene{
     {
         this.initMockup();
         
-    }
-    update(time: number, delta: number): void {
-        this.handleChanges(delta);
     }
     initMockup(){
         const mockup=this.add.image(0,0,'mockup').setOrigin(0,0);
@@ -84,33 +82,46 @@ export default class GameScene extends Scene{
                         if(change.field=="x"){
                             updates.x=change.value;
                         }
-                        
                         if(change.field=="y"){
                             updates.y=change.value;
                         }
+                        
                         if(change.field=="state"){
                             updates.state=change.value;
                         }
+                    
                     })
                     this.findDirection();
                 }
+                this.listOfPlayers.forEach((e)=>{
+                    if(!e.inScene){
+                        if(e.id==user.id){
+                            e.healthBarTextureKey='green_healthbar';
+                        }
+                        else{
+                            e.healthBarTextureKey='red_healthbar'
+                        }
+                        e.addToScene();
+                    } 
+                })
             })
-            this.listOfPlayers.forEach((e)=>{
-                if(!e.inScene){
-                    if(e.id==user.id){
-                        e.healthBarTextureKey='green_healthbar';
-                    }
-                    else{
-                        e.healthBarTextureKey='red_healthbar'
-                    }
-                    e.addToScene();
-                } 
-            })
+            
         }
 //-----Sync Player----//
-        this.syncPlayer(delta);
+
+this.listOfPlayers.forEach((e)=>{
+    if(e.state==HumanState.l_running){  
+        e.move(delta);
+        e.healthBarObj.destroy();
+        e.addHealthBar();
+        e.titleObj.destroy();
+        e.addTitle();
+        e.playAnim();
+    }
+})
+this.syncPlayer(delta);
 //--------------------------------------------------------------------//
-        players.onRemove=(item,key)=>{
+    players.onRemove=(item,key)=>{
             // ! at the end helps in removing null or undefined
             const player:Player=this.listOfPlayers.get(item.id)!;
             this.listOfPlayers.delete(item.id);
@@ -123,20 +134,25 @@ export default class GameScene extends Scene{
         if(this.listOfPlayers.has(updates.id)){
             const player=this.listOfPlayers.get(updates.id)!;
             player.id=updates.id;
+            player.targetX=updates.x;
+            player.targetY=updates.y;
             player.state=updates.state;
             player.title=updates.title;
             player.alive=updates.alive;
+            /*
             //destroy old healthBarObj to be replaced by new
             player.healthBarObj.destroy();
             player.addHealthBar();
             //destroy old titleObj to be replaced by new
             player.titleObj.destroy();
             player.addTitle();
-            this.movePlayer(player,delta);
-            this.handleAnim(player);
+            */
+            //player.move(delta,updates.x,updates.y);
+            //this.handleAnim(player);
         }   
     }
     movePlayer(player:Player,delta:number){
+        /*
         const delX = updates.x-player.x;
         const delY = updates.y-player.y;
         if(delX==0 && delY==0){
@@ -152,8 +168,14 @@ export default class GameScene extends Scene{
         const diffY = Math.abs(delY);
         if(diffX<1 && diffY<1 && player.state!=HumanState.l_stance){
             player.state=HumanState.l_stance;
-            //updates.state=HumanState.l_stance;
+            const temp=user.room.state.players.get(player.id);
+            temp.state=HumanState.l_stance;
+            updates.state=temp.state;
+            console.log(temp);
         }
+        */
+        //player.x=Phaser.Math.Linear(player.x,updates.x,0.001*delta);
+        //player.y=Phaser.Math.Linear(player.y,updates.y,0.001*delta);
     }
     findDirection(){
         const player=this.listOfPlayers.get(updates.id)!;
@@ -181,15 +203,9 @@ export default class GameScene extends Scene{
             console.log("Up");
         }
     }
-    handleAnim(player:Player){
-        if(player.state==HumanState.l_running && player.animKey!="running"){
-            console.log("run")
-            player.animKey="running";
-            player.playAnim();   
-        }
-        if(player.state==HumanState.l_stance && player.animKey!="stance"){
-            player.animKey="stance";
-            player.playAnim(); 
-        }
+ 
+
+    update(time: number, delta: number): void {
+        this.handleChanges(delta);
     }
 }

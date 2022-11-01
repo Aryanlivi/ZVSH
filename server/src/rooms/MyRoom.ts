@@ -30,7 +30,7 @@ export class MyRoom extends Room<MyRoomState>{
           title:'title',
           alive:true,
           id:client.id,
-          x:200,
+          x:700,
           y:200,
           healthBarObj:'my_healthBar'
         });
