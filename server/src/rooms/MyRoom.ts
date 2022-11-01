@@ -16,7 +16,8 @@ export class MyRoom extends Room<MyRoomState>{
       const player=this.state.players.get(client.id);
       player.assign({
         x:mouseclick.x,
-        y:mouseclick.y
+        y:mouseclick.y,
+        state:HumanState.l_running
       })
     })
   }

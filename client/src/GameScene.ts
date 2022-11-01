@@ -1,26 +1,25 @@
-import  Human  from "./Human";
+import  Human, { HumanState }  from "./Human";
 import {Scene} from "phaser";
 import {user} from "./services/User";
 import Player from "./Player";
-import Zombie  from "./Zombie";
+//import Zombie  from "./Zombie";
 import {MapSchema } from "@colyseus/schema";
-import { ChangeOperation } from "@colyseus/schema/lib/changes/ChangeTree";
-
-
 //let tempid:string="";
 type ChangeObj={
     x:number,
     y:number,
     title:string,
     id:string,
-    alive:boolean
+    alive:boolean,
+    state:number
 };
-let updates:ChangeObj={
+const updates:ChangeObj={
     x:0,
     y:0,
     title:"",
     id:"",
-    alive:true
+    alive:true,
+    state:0
 };
 export default class GameScene extends Scene{
     player:Player;
@@ -89,6 +88,9 @@ export default class GameScene extends Scene{
                         if(change.field=="y"){
                             updates.y=change.value;
                         }
+                        if(change.field=="state"){
+                            updates.state=change.value;
+                        }
                     })
                     this.findDirection();
                 }
@@ -105,38 +107,57 @@ export default class GameScene extends Scene{
                 } 
             })
         }
-        this.movePlayer(delta);
-
-        ////////////////////
+//-----Sync Player----//
+        this.syncPlayer(delta);
+//--------------------------------------------------------------------//
         players.onRemove=(item,key)=>{
             // ! at the end helps in removing null or undefined
             const player:Player=this.listOfPlayers.get(item.id)!;
             this.listOfPlayers.delete(item.id);
-            player.destroyAll();
+            player.remove();
             console.log(player+"Removed");
         }
     }
 
-    movePlayer(delta:number){
+    syncPlayer(delta:number){
         if(this.listOfPlayers.has(updates.id)){
             const player=this.listOfPlayers.get(updates.id)!;
             player.id=updates.id;
-            const step=0.004;
-            player.x=Phaser.Math.Linear(player.x,updates.x,step*delta);
-            player.y=Phaser.Math.Linear(player.y,updates.y,step*delta);
+            player.state=updates.state;
             player.title=updates.title;
             player.alive=updates.alive;
+            //destroy old healthBarObj to be replaced by new
             player.healthBarObj.destroy();
             player.addHealthBar();
+            //destroy old titleObj to be replaced by new
             player.titleObj.destroy();
             player.addTitle();
+            this.movePlayer(player,delta);
+            this.handleAnim(player);
         }   
     }
-    
+    movePlayer(player:Player,delta:number){
+        const delX = updates.x-player.x;
+        const delY = updates.y-player.y;
+        if(delX==0 && delY==0){
+            player.x = player.x + Math.cos(Math.PI/2) * player.walkSpeed;
+            player.y = player.y + Math.sin(0) * player.walkSpeed;
+        }
+        else{
+            const rotation:number=Math.atan2(delY, delX);
+            player.x = player.x + Math.cos(rotation) * player.walkSpeed;
+            player.y = player.y + Math.sin(rotation) * player.walkSpeed;
+        }
+        const diffX = Math.abs(delX);
+        const diffY = Math.abs(delY);
+        if(diffX<1 && diffY<1 && player.state!=HumanState.l_stance){
+            player.state=HumanState.l_stance;
+            //updates.state=HumanState.l_stance;
+        }
+    }
     findDirection(){
         const player=this.listOfPlayers.get(updates.id)!;
         if(updates.x>player.x){
-            console.log("Right"+"newx:"+updates.x+"\t oldx:"+player.x);
             if(updates.y>player.y){
                 console.log("Right Down");
             }
@@ -158,6 +179,17 @@ export default class GameScene extends Scene{
         }
         if(updates.y<player.y){
             console.log("Up");
+        }
+    }
+    handleAnim(player:Player){
+        if(player.state==HumanState.l_running && player.animKey!="running"){
+            console.log("run")
+            player.animKey="running";
+            player.playAnim();   
+        }
+        if(player.state==HumanState.l_stance && player.animKey!="stance"){
+            player.animKey="stance";
+            player.playAnim(); 
         }
     }
 }

@@ -1,7 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import {Scene} from "phaser";
 import {user} from "./services/User";
-
-export let isAssigned:boolean=false;
 export default class PreloadScene extends Scene{
     constructor(){
         super('PreloadScene_Key');
@@ -45,8 +44,8 @@ export default class PreloadScene extends Scene{
         }
     }
     choosePlayer(){
-        let human_btn=document.getElementById("human-btn");
-        let zombie_btn=document.getElementById("zombie-btn");
+        const human_btn=document.getElementById("human-btn");
+        const zombie_btn=document.getElementById("zombie-btn");
         human_btn?.addEventListener("click",()=>{
             user.room.send("Assign-Human");
             human_btn?.setAttribute("disabled","disabled");

@@ -5,7 +5,6 @@ export enum HumanState{
 }
 export class Human extends Player{
     private static readonly walkSpeed:number=1.0;
-    state:HumanState;
     constructor(){
         super();
         this.state=HumanState.l_stance;
