@@ -15,21 +15,20 @@ export default class Player extends Phaser.GameObjects.Sprite{
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
-    constructor(scene,x:number,y:number,texture:string,title:string,alive:boolean,id:string,state:HumanState){
+    constructor(scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:HumanState){
         super(scene,x,y,texture);
         this.inScene=false;
         this.title=title;
         this.alive=alive;
         this.id=id;
         this.animKey=this.getanimKey(state);
-        this.targetX=this.x;
-        this.targetY=this.y;
+        this.targetX=targetX;
+        this.targetY=targetY;
     }
-    getanimKey(state:number){
+    getanimKey(state:HumanState){
         switch(state){
             case HumanState.l_stance:
                 return "stance";
-                
             case HumanState.l_running:
                 return "running";   
             default:
@@ -70,10 +69,12 @@ export default class Player extends Phaser.GameObjects.Sprite{
 
     playAnim(){
         if(this.state==HumanState.l_running && this.animKey!="running"){
+            console.log(this.id+" run")
             this.animKey="running";  
             this.play(this.animKey);
         }
-        if(this.state==HumanState.l_stance && this.animKey!="stance"){
+        else if(this.state==HumanState.l_stance && this.animKey!="stance"){
+            console.log(this.id+" stance")
             this.animKey="stance";
             this.play(this.animKey);
         }

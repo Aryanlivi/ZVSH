@@ -11,31 +11,30 @@ const TEXTURE_KEY="human";
 
 ///
 export default class Human extends Player{
-    delX:number;
-    delY:number;
-    
-    constructor(scene:Phaser.Scene,x:number,y:number,title:string,alive:boolean,id:string,state:HumanState){
-        super(scene,x,y,TEXTURE_KEY,title,alive,id,state);
+
+    constructor(scene:Phaser.Scene,x:number,y:number,targetX:number,targetY:number,title:string,alive:boolean,id:string,state:HumanState){
+        super(scene,x,y,targetX,targetY,TEXTURE_KEY,title,alive,id,state);
         this.state=state;
-        console.log("initial:"+state)
-        this.walkSpeed=1.0;
+        this.walkSpeed=1.8;
     }
 
     move(){
-        ///console.log(this.id+"asked to move");
-        this.delX = this.targetX-this.x;
-        this.delY = this.targetY-this.y;
-        const diffX = Math.abs(this.delX);
-        const diffY = Math.abs(this.delY);
-        if(this.delX==0 && this.delY==0){
+        //onclick event state wouldve been changed from the server's command.
+        const delX = this.targetX-this.x;
+        const delY = this.targetY-this.y;
+        const diffX = Math.abs(delX);
+        const diffY = Math.abs(delY);
+        //console.log(this.id+"has state:"+this.state+"and animKey"+this.animKey);
+        if(delX==0 && delY==0 || this.state==HumanState.l_stance){
             this.x = this.x + Math.cos(Math.PI/2) * this.walkSpeed;
             this.y = this.y + Math.sin(0) * this.walkSpeed;
             return;
         }
         else{
-            const rotation:number=Math.atan2(this.delY, this.delX);
+            const rotation:number=Math.atan2(delY,delX);
             this.x = this.x + Math.cos(rotation) * this.walkSpeed;
             this.y = this.y + Math.sin(rotation) * this.walkSpeed;
+            user.room.send("Update-Pos",{id:this.id,x:this.x,y:this.y});
         }
         if(diffX<1 && diffY<1 && this.state!=HumanState.l_stance){
             this.state=HumanState.l_stance;

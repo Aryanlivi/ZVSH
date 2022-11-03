@@ -58,15 +58,14 @@ export default class GameScene extends Scene{
                     case "id":
                         playerToUpdate.id=change.value;
                         break;
-                    case "x":
+                    case "targetX":
                         playerToUpdate.targetX=change.value;
                         break;
-                    case "y":
+                    case "targetY":
                         playerToUpdate.targetY=change.value;
                         break;
                     case "state":
                         playerToUpdate.state=change.value;
-                        console.log(playerToUpdate.id+":"+playerToUpdate.state);
                         break;
                 }
             })
@@ -110,7 +109,7 @@ export default class GameScene extends Scene{
         //---->ON ADD & CHANGES//
         PLAYERS.onAdd=(item,key)=>{
             PLAYERS.forEach((player,key)=>{
-                const human=new Human(this,player.x,player.y,player.title,player.alive,player.id,player.state);
+                const human=new Human(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
                 this.addPlayers(player.id,human)
                 this.changePlayerData(player);
             })

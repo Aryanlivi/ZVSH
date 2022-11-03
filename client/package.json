@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "parcel index.html"
+    "start": "npm run clean & parcel index.html",
+    "clean": "rimraf .parcel-cache"
   },
   "dependencies": {
     "@colyseus/schema": "^1.0.41",

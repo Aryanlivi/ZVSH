@@ -12,17 +12,21 @@ export class MyRoom extends Room<MyRoomState>{
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
     this.assignPlayer();
+    this.onMessage("Update-Pos",(client,message)=>{
+      const player=this.state.players.get(message.id);
+      player.x=message.x;
+      player.y=message.y;
+    })
     this.onMessage("Change-State",(client,message)=>{
       const player=this.state.players.get(message.id);
       player.state=message.state;
-      console.log(message.id+":"+player.state);
     })
     this.onMessage("Pointer-Down",(client,mouseclick)=>{
       const player=this.state.players.get(client.id);
       //console.log(player.state);
       player.assign({
-        x:mouseclick.x,
-        y:mouseclick.y,
+        targetX:mouseclick.x,
+        targetY:mouseclick.y,
         state:HumanState.l_running
       })
     })
@@ -39,6 +43,8 @@ export class MyRoom extends Room<MyRoomState>{
           id:client.id,
           x:700,
           y:200,
+          targetX:human.x,
+          targetY:human.y,
           healthBarObj:'my_healthBar'
         });
         this.state.players.set(client.id,human);
