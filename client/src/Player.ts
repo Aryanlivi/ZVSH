@@ -15,15 +15,26 @@ export default class Player extends Phaser.GameObjects.Sprite{
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
-    constructor(scene,x:number,y:number,texture:string,title:string,alive:boolean,id:string){
+    constructor(scene,x:number,y:number,texture:string,title:string,alive:boolean,id:string,state:HumanState){
         super(scene,x,y,texture);
         this.inScene=false;
         this.title=title;
         this.alive=alive;
         this.id=id;
-        this.animKey="stance";
+        this.animKey=this.getanimKey(state);
         this.targetX=this.x;
         this.targetY=this.y;
+    }
+    getanimKey(state:number){
+        switch(state){
+            case HumanState.l_stance:
+                return "stance";
+                
+            case HumanState.l_running:
+                return "running";   
+            default:
+                return "stance";    
+        }
     }
     addToScene(){
         this.inScene=true;
@@ -32,6 +43,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.play(this.animKey);
         this.scene.add.existing(this);
     }
+    //for testing purposes
     addcircle(){
         this.circle=this.scene.add.graphics();
         this.circle.lineStyle(2, 0xff0000,1);
@@ -40,35 +52,22 @@ export default class Player extends Phaser.GameObjects.Sprite{
         const offsetY=35;
         this.circle.strokeCircle(topCenter.x, topCenter.y+offsetY, radius);
     }
+
     addTitle(): void {
         const FONTFAMILY= 'Georgia, "Goudy Bookletter 1911", Times, serif';
         this.titleObj=this.scene.add.text(this.getTopCenter().x,this.getTopCenter().y,this.id, { fontFamily:FONTFAMILY }).setOrigin(0.5,0)
     }
+
     addHealthBar(){
         const topCenter=this.getTopCenter();
         const offsetY=35;
         this.healthBarObj=this.scene.add.image(topCenter.x,topCenter.y+offsetY,this.healthBarTextureKey);
     }
-    move(delta:number){
-        console.log(this.id+"asked to move");
-        const delX = this.targetX-this.x;
-        const delY = this.targetY-this.y;
-        const diffX = Math.abs(delX);
-        const diffY = Math.abs(delY);
-        if(delX==0 && delY==0){
-            console.log("asd")
-            this.x = this.x + Math.cos(Math.PI/2) * this.walkSpeed;
-            this.y = this.y + Math.sin(0) * this.walkSpeed;
-        }
-        else{
-            const rotation:number=Math.atan2(delY, delX);
-            this.x = this.x + Math.cos(rotation) * this.walkSpeed;
-            this.y = this.y + Math.sin(rotation) * this.walkSpeed;
-        }
-        if(diffX<1 && diffY<1 && this.state!=HumanState.l_stance){
-            this.state=HumanState.l_stance;
-        }
+
+    move(){
+        return;
     }
+
     playAnim(){
         if(this.state==HumanState.l_running && this.animKey!="running"){
             this.animKey="running";  
@@ -79,6 +78,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
             this.play(this.animKey);
         }
     }
+
     remove(){
         this.healthBarObj.destroy();
         this.titleObj.destroy();

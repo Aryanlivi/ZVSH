@@ -27,6 +27,13 @@ export default class PreloadScene extends Scene{
 			sprZombie.add("l_running", [4, 5, 6, 7, 8, 9, 10, 11], 9, true);
         */
         this.add.image(0,0,"mockup").setOrigin(0,0);
+        this.createAnims(); 
+        if(await user.join()){
+            this.choosePlayer();
+        }
+    }
+
+    createAnims(){
         this.anims.create({
             key: 'stance',
             frames: this.anims.generateFrameNumbers('human', { frames: [ 0, 1, 2, 3] }),
@@ -39,10 +46,8 @@ export default class PreloadScene extends Scene{
             frameRate: 9,
             repeat: -1
         });
-        if(await user.join()){
-            this.choosePlayer();
-        }
     }
+    
     choosePlayer(){
         const human_btn=document.getElementById("human-btn");
         const zombie_btn=document.getElementById("zombie-btn");

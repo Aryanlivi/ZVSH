@@ -2,41 +2,30 @@ import  Human, { HumanState }  from "./Human";
 import {Scene} from "phaser";
 import {user} from "./services/User";
 import Player from "./Player";
+import PlayerSchema from "../../server//src/PlayerSchema"
 //import Zombie  from "./Zombie";
-import {MapSchema } from "@colyseus/schema";
-//let tempid:string="";
-type ChangeObj={
-    x:number,
-    y:number,
-    title:string,
-    id:string,
-    alive:boolean,
-    state:number
-};
-const updates:ChangeObj={
-    x:0,
-    y:0,
-    title:"",
-    id:"",
-    alive:true,
-    state:0
-};
+import {MapSchema} from "@colyseus/schema";
+
+//---->Main Game Scene----//
 export default class GameScene extends Scene{
-    player:Player;
-    id:string;
-    listOfPlayers:Map<string,Player>=new Map();
-    listOfUpdates:Map<string,ChangeObj>=new Map();
+    //Data Members:
+    private player:Player;
+    private id:string;
+    private listOfPlayers:Map<string,Player>=new Map();
     constructor(){
+        //super takes in a key as arg to identify scene!
         super('GameScene_Key');
     }
-
+    //---->Phaser Preload----//
     preload(){ console.log("gamescene") } 
-    
+    //---->Phaser Create----//
     create ()
     {
         this.initMockup();
         
     }
+
+    //---->initializes Mockup----//
     initMockup(){
         const mockup=this.add.image(0,0,'mockup').setOrigin(0,0);
         mockup.setInteractive();
@@ -51,132 +40,94 @@ export default class GameScene extends Scene{
             }
         })
     }
-    
-    handleChanges(delta:number)
-    { 
-        const players:MapSchema=user.room.state.players;
-        players.onAdd=(item,key)=>{
 
-            //Sync players<MapSchema> to listofPlayers
-            players.forEach((e,key)=>{
-                const human=new Human(this,e.x,e.y,e.title,e.alive,e.id,e.state);
-                if(!this.listOfPlayers.has(e.id))   
-                {
-                    this.listOfPlayers.set(e.id,human);
+//###------>Functions involving Player//
+
+    //---->handles player updates----//
+    changePlayerData(player:PlayerSchema){
+        player.onChange=(changes)=>{
+            changes.forEach((change)=>{
+                const playerToUpdate=this.listOfPlayers.get(player.id)!;
+                switch(change.field){
+                    case "alive":
+                        playerToUpdate.alive=change.value;
+                        break;
+                    case "title":
+                        playerToUpdate.title=change.value;
+                        break;
+                    case "id":
+                        playerToUpdate.id=change.value;
+                        break;
+                    case "x":
+                        playerToUpdate.targetX=change.value;
+                        break;
+                    case "y":
+                        playerToUpdate.targetY=change.value;
+                        break;
+                    case "state":
+                        playerToUpdate.state=change.value;
+                        console.log(playerToUpdate.id+":"+playerToUpdate.state);
+                        break;
                 }
-                ////////////
-                e.onChange=(changes)=>{
-                    changes.forEach((change)=>{
-                        updates.id=e.id;
-                        if(change.field=="alive"){
-                            updates.alive=change.value;
-                        }
-                        if(change.field=="title"){
-                            updates.title=change.value;
-                        }
-                        
-                        if(change.field=="id"){
-                            updates.id=change.value;
-                        }
-                        
-                        if(change.field=="x"){
-                            updates.x=change.value;
-                        }
-                        if(change.field=="y"){
-                            updates.y=change.value;
-                        }
-                        
-                        if(change.field=="state"){
-                            updates.state=change.value;
-                        }
-                    
-                    })
-                    this.findDirection();
-                }
-                this.listOfPlayers.forEach((e)=>{
-                    if(!e.inScene){
-                        if(e.id==user.id){
-                            e.healthBarTextureKey='green_healthbar';
-                        }
-                        else{
-                            e.healthBarTextureKey='red_healthbar'
-                        }
-                        e.addToScene();
-                    } 
-                })
             })
-            
         }
-//-----Sync Player----//
-
-this.listOfPlayers.forEach((e)=>{
-    if(e.state==HumanState.l_running){  
-        e.move(delta);
-        e.healthBarObj.destroy();
-        e.addHealthBar();
-        e.titleObj.destroy();
-        e.addTitle();
-        e.playAnim();
     }
-})
-this.syncPlayer(delta);
-//--------------------------------------------------------------------//
-    players.onRemove=(item,key)=>{
-            // ! at the end helps in removing null or undefined
+
+    //---->Add Players to list and scene----//
+    addPlayers(id:string,player:Player){
+        //Sync players<MapSchema> to listofPlayers
+        if(!this.listOfPlayers.has(id))   
+        {
+            this.listOfPlayers.set(id,player);
+        }
+
+        //-->Adds to Scene
+        this.listOfPlayers.forEach((player)=>{
+            if(!player.inScene){
+                if(player.id==user.id){
+                    player.healthBarTextureKey='green_healthbar';
+                }
+                else{
+                    player.healthBarTextureKey='red_healthbar'
+                }
+                player.addToScene();
+            } 
+        })
+    }
+
+    //---->Handle Player Movements----//
+    movePlayers(){
+        this.listOfPlayers.forEach((player)=>{
+            player.move();
+        })
+    }
+//---------###//
+
+    //---->Handles Server Changes Related To Players----//
+    handleChanges(delta:number){ 
+        const PLAYERS:MapSchema=user.room.state.players;
+        
+        //---->ON ADD & CHANGES//
+        PLAYERS.onAdd=(item,key)=>{
+            PLAYERS.forEach((player,key)=>{
+                const human=new Human(this,player.x,player.y,player.title,player.alive,player.id,player.state);
+                this.addPlayers(player.id,human)
+                this.changePlayerData(player);
+            })
+        }
+
+        //---->ON REMOVE----//
+        PLAYERS.onRemove=(item,key)=>{
             const player:Player=this.listOfPlayers.get(item.id)!;
-            this.listOfPlayers.delete(item.id);
+            this.listOfPlayers.delete(key);
             player.remove();
             console.log(player+"Removed");
         }
-    }
 
-    syncPlayer(delta:number){
-        if(this.listOfPlayers.has(updates.id)){
-            const player=this.listOfPlayers.get(updates.id)!;
-            player.id=updates.id;
-            player.targetX=updates.x;
-            player.targetY=updates.y;
-            player.state=updates.state;
-            player.title=updates.title;
-            player.alive=updates.alive;
-            /*
-            //destroy old healthBarObj to be replaced by new
-            player.healthBarObj.destroy();
-            player.addHealthBar();
-            //destroy old titleObj to be replaced by new
-            player.titleObj.destroy();
-            player.addTitle();
-            */
-            //player.move(delta,updates.x,updates.y);
-            //this.handleAnim(player);
-        }   
+        //--->PLAYER MOVEMENT----//
+        this.movePlayers();
     }
-    movePlayer(player:Player,delta:number){
-        /*
-        const delX = updates.x-player.x;
-        const delY = updates.y-player.y;
-        if(delX==0 && delY==0){
-            player.x = player.x + Math.cos(Math.PI/2) * player.walkSpeed;
-            player.y = player.y + Math.sin(0) * player.walkSpeed;
-        }
-        else{
-            const rotation:number=Math.atan2(delY, delX);
-            player.x = player.x + Math.cos(rotation) * player.walkSpeed;
-            player.y = player.y + Math.sin(rotation) * player.walkSpeed;
-        }
-        const diffX = Math.abs(delX);
-        const diffY = Math.abs(delY);
-        if(diffX<1 && diffY<1 && player.state!=HumanState.l_stance){
-            player.state=HumanState.l_stance;
-            const temp=user.room.state.players.get(player.id);
-            temp.state=HumanState.l_stance;
-            updates.state=temp.state;
-            console.log(temp);
-        }
-        */
-        //player.x=Phaser.Math.Linear(player.x,updates.x,0.001*delta);
-        //player.y=Phaser.Math.Linear(player.y,updates.y,0.001*delta);
-    }
+/*
     findDirection(){
         const player=this.listOfPlayers.get(updates.id)!;
         if(updates.x>player.x){
@@ -203,8 +154,9 @@ this.syncPlayer(delta);
             console.log("Up");
         }
     }
- 
-
+*/
+    
+    //--->MAIN GAME LOOP----//
     update(time: number, delta: number): void {
         this.handleChanges(delta);
     }

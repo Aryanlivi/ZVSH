@@ -1,7 +1,7 @@
 import { Room, Client, Deferred } from "colyseus";
 import MyRoomState from "./schema/MyRoomState";
 import { Human,HumanState} from "../Human";
-import Player from "../Player";
+import PlayerSchema from "../PlayerSchema";
 
 export class MyRoom extends Room<MyRoomState>{
 
@@ -12,8 +12,14 @@ export class MyRoom extends Room<MyRoomState>{
   onJoin (client: Client, options: any) {
     console.log(client.sessionId, "joined!");
     this.assignPlayer();
+    this.onMessage("Change-State",(client,message)=>{
+      const player=this.state.players.get(message.id);
+      player.state=message.state;
+      console.log(message.id+":"+player.state);
+    })
     this.onMessage("Pointer-Down",(client,mouseclick)=>{
       const player=this.state.players.get(client.id);
+      //console.log(player.state);
       player.assign({
         x:mouseclick.x,
         y:mouseclick.y,
@@ -21,9 +27,10 @@ export class MyRoom extends Room<MyRoomState>{
       })
     })
   }
+  
   assignPlayer(){
       this.onMessage("Assign-Human",(client,message)=>{
-        console.log(client.id+"is now a Human.");
+        console.log(client.id+"is now a Human.");       
         const human=new Human();
         human.assign({
           state:HumanState.l_stance,
@@ -43,14 +50,15 @@ export class MyRoom extends Room<MyRoomState>{
     })
     */
   }
-    onLeave (client: Client, consented: boolean) {
+
+  onLeave (client: Client, consented: boolean) {
       console.log(client.sessionId, "left!");
       this.state.players.delete(client.id)
       console.log(this.state.players.size);
-    }
+  }
   
-    onDispose() {
+  onDispose() {
       console.log("room", this.roomId, "disposing...");
-      }
+  }
 
 }

@@ -1,6 +1,6 @@
 import {Schema,type} from "@colyseus/schema";
 import {HumanState} from "./Human";
-export default class Player extends Schema{
+export default class PlayerSchema extends Schema{
     @type("string") title:string;
     @type("boolean")alive:Boolean;
     @type("string") id:string;

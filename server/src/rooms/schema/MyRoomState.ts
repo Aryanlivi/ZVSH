@@ -1,8 +1,8 @@
 import { Schema,MapSchema ,Context, type } from "@colyseus/schema";
-import Player from "../../Player";
+import PlayerSchema from "../../PlayerSchema";
 
 export default class MyRoomState extends Schema {
-  @type({map:Player})players: MapSchema<Player>;
+  @type({map:PlayerSchema})players: MapSchema<PlayerSchema>;
   
   constructor(){
     super();
