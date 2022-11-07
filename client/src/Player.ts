@@ -1,9 +1,16 @@
 import Phaser from "phaser";
+import { KEY } from "./Constants";
 import { HumanState } from "./Human";
-
+export function Distance(x1:number,y1:number,x2:number,y2:number){
+    const DELX=x2-x1;
+    const DELY=y2-y1;
+    const X=Math.pow(DELX,2);
+    const Y=Math.pow(DELY,2);
+    const MAGNITUDE=Math.sqrt(X+Y)
+    return {magnitude:MAGNITUDE,X:X,Y:Y,delX:DELX,delY:DELY};
+}
 export default class Player extends Phaser.GameObjects.Sprite{
     walkSpeed:number; 
-    state:number;
     inScene:boolean;
     titleObj:Phaser.GameObjects.Text;
     title:string;
@@ -15,25 +22,16 @@ export default class Player extends Phaser.GameObjects.Sprite{
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
-    constructor(scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:HumanState){
+    constructor(scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:number){
         super(scene,x,y,texture);
         this.inScene=false;
+        this.state=state;
         this.title=title;
         this.alive=alive;
         this.id=id;
-        this.animKey=this.getanimKey(state);
+        this.setAnim();
         this.targetX=targetX;
         this.targetY=targetY;
-    }
-    getanimKey(state:HumanState){
-        switch(state){
-            case HumanState.l_stance:
-                return "stance";
-            case HumanState.l_running:
-                return "running";   
-            default:
-                return "stance";    
-        }
     }
     addToScene(){
         this.inScene=true;
@@ -46,10 +44,10 @@ export default class Player extends Phaser.GameObjects.Sprite{
     addcircle(){
         this.circle=this.scene.add.graphics();
         this.circle.lineStyle(2, 0xff0000,1);
-        const radius = 2;
-        const topCenter=this.getTopCenter();
-        const offsetY=35;
-        this.circle.strokeCircle(topCenter.x, topCenter.y+offsetY, radius);
+        const RADIUS = 2;
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET_Y=35;
+        this.circle.strokeCircle(TOP_CENTER.x, TOP_CENTER.y+OFFSET_Y, RADIUS);
     }
 
     addTitle(): void {
@@ -58,32 +56,44 @@ export default class Player extends Phaser.GameObjects.Sprite{
     }
 
     addHealthBar(){
-        const topCenter=this.getTopCenter();
-        const offsetY=35;
-        this.healthBarObj=this.scene.add.image(topCenter.x,topCenter.y+offsetY,this.healthBarTextureKey);
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET_Y=35;
+        this.healthBarObj=this.scene.add.image(TOP_CENTER.x,TOP_CENTER.y+OFFSET_Y,this.healthBarTextureKey);
     }
 
     move(){
         return;
     }
-
-    playAnim(){
-        if(this.state==HumanState.l_running && this.animKey!="running"){
-            console.log(this.id+" run")
-            this.animKey="running";  
-            this.play(this.animKey);
-        }
-        else if(this.state==HumanState.l_stance && this.animKey!="stance"){
-            console.log(this.id+" stance")
-            this.animKey="stance";
-            this.play(this.animKey);
+    setAnim(){
+        switch(this.state){
+            case HumanState.stance:
+                this.animKey=KEY.stance;
+                break;
+            case HumanState.running:
+                this.animKey=KEY.running;
+                break;
         }
     }
-
+    playAnim(){
+        if(this.state==HumanState.running && this.animKey!=KEY.running){
+            console.log(this.id+" run")
+            this.animKey=KEY.running;  
+            this.play(this.animKey);
+        }
+        if(this.state==HumanState.stance && this.animKey!=KEY.stance){
+            console.log(this.id+" stance")
+            this.animKey=KEY.stance;
+            this.play(this.animKey);
+            this.update()
+        }
+    }
     remove(){
         this.healthBarObj.destroy();
         this.titleObj.destroy();
         this.destroy();
+    }
+    update(): void {
+        return;
     }
 }
 

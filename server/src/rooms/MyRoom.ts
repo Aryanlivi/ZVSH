@@ -1,6 +1,6 @@
 import { Room, Client, Deferred } from "colyseus";
 import MyRoomState from "./schema/MyRoomState";
-import { Human,HumanState} from "../Human";
+import { Human, HumanState} from "../Human";
 import PlayerSchema from "../PlayerSchema";
 
 export class MyRoom extends Room<MyRoomState>{
@@ -27,7 +27,7 @@ export class MyRoom extends Room<MyRoomState>{
       player.assign({
         targetX:mouseclick.x,
         targetY:mouseclick.y,
-        state:HumanState.l_running
+        state:HumanState.running
       })
     })
   }
@@ -37,7 +37,7 @@ export class MyRoom extends Room<MyRoomState>{
         console.log(client.id+"is now a Human.");       
         const human=new Human();
         human.assign({
-          state:HumanState.l_stance,
+          state:HumanState.stance,
           title:'title',
           alive:true,
           id:client.id,

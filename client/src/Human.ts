@@ -1,46 +1,40 @@
-import Player from "./Player";
+import Player,{Distance} from "./Player";
 import Phaser from "phaser";
 import {user} from "./services/User";
-//------Human States:
+import { KEY } from "./Constants";
+
 export enum HumanState{
-    l_stance=0,
-    l_running
+    stance=0,
+    running
 }
-//------Constants:
-const TEXTURE_KEY="human";
 
 ///
 export default class Human extends Player{
 
-    constructor(scene:Phaser.Scene,x:number,y:number,targetX:number,targetY:number,title:string,alive:boolean,id:string,state:HumanState){
-        super(scene,x,y,targetX,targetY,TEXTURE_KEY,title,alive,id,state);
-        this.state=state;
+    constructor(scene:Phaser.Scene,x:number,y:number,targetX:number,targetY:number,title:string,alive:boolean,id:string,state:number){
+        super(scene,x,y,targetX,targetY,KEY.human,title,alive,id,state);
         this.walkSpeed=1.8;
     }
 
     move(){
-        //onclick event state wouldve been changed from the server's command.
-        const delX = this.targetX-this.x;
-        const delY = this.targetY-this.y;
-        const diffX = Math.abs(delX);
-        const diffY = Math.abs(delY);
-        //console.log(this.id+"has state:"+this.state+"and animKey"+this.animKey);
-        if(delX==0 && delY==0 || this.state==HumanState.l_stance){
-            this.x = this.x + Math.cos(Math.PI/2) * this.walkSpeed;
-            this.y = this.y + Math.sin(0) * this.walkSpeed;
-            return;
-        }
-        else{
-            const rotation:number=Math.atan2(delY,delX);
+        const DISTANCE=Distance(this.x,this.y,this.targetX,this.targetY);
+        if(DISTANCE.magnitude>=2){
+            const rotation:number=Math.atan2(DISTANCE.delY,DISTANCE.delX);
             this.x = this.x + Math.cos(rotation) * this.walkSpeed;
             this.y = this.y + Math.sin(rotation) * this.walkSpeed;
             user.room.send("Update-Pos",{id:this.id,x:this.x,y:this.y});
+            this.state=HumanState.running;
+
         }
-        if(diffX<1 && diffY<1 && this.state!=HumanState.l_stance){
-            this.state=HumanState.l_stance;
-            console.log(this.id+"changed its state");
+        if(DISTANCE.magnitude<2 && this.state!=HumanState.stance){
+            this.state=HumanState.stance;
+            console.log(this.id+" changed its state");
             user.room.send("Change-State",{id:this.id,state:this.state});
         }
+    }
+    update(){
+        this.move();
+        //replace with new healthbar as u move
         this.healthBarObj.destroy();
         this.addHealthBar();
         this.titleObj.destroy();

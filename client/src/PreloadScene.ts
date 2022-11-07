@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import {Scene} from "phaser";
 import {user} from "./services/User";
+import {KEY} from "./Constants"
 export default class PreloadScene extends Scene{
     constructor(){
-        super('PreloadScene_Key');
+        super(KEY.preload);
     }
     preload(){
-        this.load.image('mockup',require('./assets/mockup.png'));
-        this.load.image('green_healthbar',require('./assets/zvh_healthBarHealthy.png'));
-        this.load.image('red_healthbar',require('./assets/zvh_healthBarUnhealthy.png'));
-        this.load.image('gift',require('./assets/gift.png'));
+        this.load.image(KEY.mockup,require('./assets/mockup.png'));
+        this.load.image(KEY.green_healthbar,require('./assets/zvh_healthBarHealthy.png'));
+        this.load.image(KEY.red_healthbar,require('./assets/zvh_healthBarUnhealthy.png'));
+        this.load.image(KEY.gift,require('./assets/gift.png'));
         this.load.spritesheet({
-            key: 'human',
+            key: KEY.human,
             url: require('./assets/human.png'),
             frameConfig: {
                 frameWidth: 128,
@@ -26,7 +27,7 @@ export default class PreloadScene extends Scene{
             sprZombie.add("l_stance", [0, 1, 2, 3], 4, true);
 			sprZombie.add("l_running", [4, 5, 6, 7, 8, 9, 10, 11], 9, true);
         */
-        this.add.image(0,0,"mockup").setOrigin(0,0);
+        this.add.image(0,0,KEY.mockup).setOrigin(0,0);
         this.createAnims(); 
         if(await user.join()){
             this.choosePlayer();
@@ -35,14 +36,14 @@ export default class PreloadScene extends Scene{
 
     createAnims(){
         this.anims.create({
-            key: 'stance',
-            frames: this.anims.generateFrameNumbers('human', { frames: [ 0, 1, 2, 3] }),
+            key: KEY.stance,
+            frames: this.anims.generateFrameNumbers(KEY.human, { frames: [ 0, 1, 2, 3] }),
             frameRate: 4,
             repeat: -1
         });
         this.anims.create({
-            key: 'running',
-            frames: this.anims.generateFrameNumbers('human', { frames: [4, 5, 6, 7, 8, 9, 10, 11] }),
+            key: KEY.running,
+            frames: this.anims.generateFrameNumbers(KEY.human, { frames: [4, 5, 6, 7, 8, 9, 10, 11] }),
             frameRate: 9,
             repeat: -1
         });
@@ -55,13 +56,13 @@ export default class PreloadScene extends Scene{
             user.room.send("Assign-Human");
             human_btn?.setAttribute("disabled","disabled");
             zombie_btn?.setAttribute("disabled","disabled");
-            this.scene.start("GameScene_Key");
+            this.scene.start(KEY.gamescene);
         })
         zombie_btn?.addEventListener("click",()=>{
             user.room.send("Assign-Zombie");
             human_btn?.setAttribute("disabled","disabled");
             zombie_btn?.setAttribute("disabled","disabled");
-            this.scene.start("GameScene_Key");
+            this.scene.start(KEY.gamescene);
         });
     }
     

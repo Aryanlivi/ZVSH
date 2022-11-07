@@ -1,6 +1,8 @@
-import  Human, { HumanState }  from "./Human";
+import  Human  from "./Human";
 import {Scene} from "phaser";
 import {user} from "./services/User";
+import { KEY } from "./Constants";
+import {listOfPlayers} from "./GlobalVar"
 import Player from "./Player";
 import PlayerSchema from "../../server//src/PlayerSchema"
 //import Zombie  from "./Zombie";
@@ -8,16 +10,13 @@ import {MapSchema} from "@colyseus/schema";
 
 //---->Main Game Scene----//
 export default class GameScene extends Scene{
-    //Data Members:
-    private player:Player;
-    private id:string;
-    private listOfPlayers:Map<string,Player>=new Map();
+    //private listOfPlayers:Map<string,Player>=new Map();
     constructor(){
         //super takes in a key as arg to identify scene!
-        super('GameScene_Key');
+        super(KEY.gamescene);
     }
     //---->Phaser Preload----//
-    preload(){ console.log("gamescene") } 
+    preload(){ console.log(KEY.gamescene) } 
     //---->Phaser Create----//
     create ()
     {
@@ -27,16 +26,16 @@ export default class GameScene extends Scene{
 
     //---->initializes Mockup----//
     initMockup(){
-        const mockup=this.add.image(0,0,'mockup').setOrigin(0,0);
-        mockup.setInteractive();
-        mockup.on("pointerdown",(pointer)=>{
+        const MOCKUP=this.add.image(0,0,KEY.mockup).setOrigin(0,0);
+        MOCKUP.setInteractive();
+        MOCKUP.on("pointerdown",(pointer)=>{
             if(pointer.leftButtonDown()){
-                const mouseclick={
+                const MOUSECLICK={
                     x:this.game.input.mousePointer.x,
                     y:this.game.input.mousePointer.y
                 }
                 //console.log("X:"+mouseclick.x+"\t Y:"+mouseclick.y);
-                user.room.send("Pointer-Down",mouseclick);  
+                user.room.send("Pointer-Down",MOUSECLICK);  
             }
         })
     }
@@ -47,25 +46,25 @@ export default class GameScene extends Scene{
     changePlayerData(player:PlayerSchema){
         player.onChange=(changes)=>{
             changes.forEach((change)=>{
-                const playerToUpdate=this.listOfPlayers.get(player.id)!;
+                const PLAYER_TO_UPDATE=listOfPlayers.get(player.id)!;
                 switch(change.field){
                     case "alive":
-                        playerToUpdate.alive=change.value;
+                        PLAYER_TO_UPDATE.alive=change.value;
                         break;
                     case "title":
-                        playerToUpdate.title=change.value;
+                        PLAYER_TO_UPDATE.title=change.value;
                         break;
                     case "id":
-                        playerToUpdate.id=change.value;
+                        PLAYER_TO_UPDATE.id=change.value;
                         break;
                     case "targetX":
-                        playerToUpdate.targetX=change.value;
+                        PLAYER_TO_UPDATE.targetX=change.value;
                         break;
                     case "targetY":
-                        playerToUpdate.targetY=change.value;
+                        PLAYER_TO_UPDATE.targetY=change.value;
                         break;
                     case "state":
-                        playerToUpdate.state=change.value;
+                        PLAYER_TO_UPDATE.state=change.value;
                         break;
                 }
             })
@@ -75,13 +74,13 @@ export default class GameScene extends Scene{
     //---->Add Players to list and scene----//
     addPlayers(id:string,player:Player){
         //Sync players<MapSchema> to listofPlayers
-        if(!this.listOfPlayers.has(id))   
+        if(!listOfPlayers.has(id))   
         {
-            this.listOfPlayers.set(id,player);
+            listOfPlayers.set(id,player);
         }
 
         //-->Adds to Scene
-        this.listOfPlayers.forEach((player)=>{
+        listOfPlayers.forEach((player)=>{
             if(!player.inScene){
                 if(player.id==user.id){
                     player.healthBarTextureKey='green_healthbar';
@@ -94,21 +93,20 @@ export default class GameScene extends Scene{
         })
     }
 
-    //---->Handle Player Movements----//
-    movePlayers(){
-        this.listOfPlayers.forEach((player)=>{
-            player.move();
+    updatePlayers(){
+        listOfPlayers.forEach((player)=>{
+            player.update();
         })
     }
 //---------###//
 
     //---->Handles Server Changes Related To Players----//
     handleChanges(delta:number){ 
-        const PLAYERS:MapSchema=user.room.state.players;
+        const PLAYERS_SCHEMA:MapSchema=user.room.state.players;
         
         //---->ON ADD & CHANGES//
-        PLAYERS.onAdd=(item,key)=>{
-            PLAYERS.forEach((player,key)=>{
+        PLAYERS_SCHEMA.onAdd=(item,key)=>{
+            PLAYERS_SCHEMA.forEach((player,key)=>{
                 const human=new Human(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
                 this.addPlayers(player.id,human)
                 this.changePlayerData(player);
@@ -116,45 +114,15 @@ export default class GameScene extends Scene{
         }
 
         //---->ON REMOVE----//
-        PLAYERS.onRemove=(item,key)=>{
-            const player:Player=this.listOfPlayers.get(item.id)!;
-            this.listOfPlayers.delete(key);
+        PLAYERS_SCHEMA.onRemove=(item,key)=>{
+            const player:Player=listOfPlayers.get(item.id)!;
+            listOfPlayers.delete(key);
             player.remove();
             console.log(player+"Removed");
         }
-
         //--->PLAYER MOVEMENT----//
-        this.movePlayers();
+        this.updatePlayers();
     }
-/*
-    findDirection(){
-        const player=this.listOfPlayers.get(updates.id)!;
-        if(updates.x>player.x){
-            if(updates.y>player.y){
-                console.log("Right Down");
-            }
-            if(updates.y<player.y){
-                console.log("Right Up");
-            }
-        }
-        if(updates.x<player.x){
-            console.log("Left");
-            if(updates.y>player.y){
-                console.log("Left Down");
-            }
-            if(updates.y<player.y){
-                console.log("Left Up");
-            }
-        }
-        if(updates.y>player.y){
-            console.log("Down");
-        }
-        if(updates.y<player.y){
-            console.log("Up");
-        }
-    }
-*/
-    
     //--->MAIN GAME LOOP----//
     update(time: number, delta: number): void {
         this.handleChanges(delta);
