@@ -4,8 +4,19 @@ export const KEY={
     red_healthbar:"red_healthbar",
     gift:"gift",
     human:"human",
+    zombie:"zombie",
     gamescene:"gamescene",
     preload:"preload",
-    stance:"stance",
-    running:"running"
+    H_stance:"hstance",
+    H_running:"hrunning",
+    Z_stance:"zstance",
+    Z_lurch:"zlurch"
+}
+export enum HumanState{
+    stance=0,
+    running
+}
+export enum ZombieState{
+    stance=2,
+    lurch
 }

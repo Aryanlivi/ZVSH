@@ -1,12 +1,13 @@
-import  Human  from "./Human";
 import {Scene} from "phaser";
 import {user} from "./services/User";
 import { KEY } from "./Constants";
 import {listOfPlayers} from "./GlobalVar"
-import Player from "./Player";
+import Player, { PlayerType } from "./Player";
 import PlayerSchema from "../../server//src/PlayerSchema"
 //import Zombie  from "./Zombie";
 import {MapSchema} from "@colyseus/schema";
+import  {Human}  from "./Human";
+import {Zombie} from "./Zombie";
 
 //---->Main Game Scene----//
 export default class GameScene extends Scene{
@@ -107,8 +108,23 @@ export default class GameScene extends Scene{
         //---->ON ADD & CHANGES//
         PLAYERS_SCHEMA.onAdd=(item,key)=>{
             PLAYERS_SCHEMA.forEach((player,key)=>{
-                const human=new Human(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
-                this.addPlayers(player.id,human)
+                let player_instance:Player;
+                switch(player.type){
+                    case PlayerType.Human:
+                    {
+                        player_instance=new Human(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
+                        console.log("human");
+                        break;
+                    }
+                    case PlayerType.Zombie:
+                        {
+                            player_instance=new Zombie(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
+                            console.log("zombie");
+                            break;
+                        }
+                }
+                
+                this.addPlayers(player.id,player_instance!)
                 this.changePlayerData(player);
             })
         }

@@ -1,15 +1,10 @@
 import Player,{Distance} from "./Player";
 import Phaser from "phaser";
 import {user} from "./services/User";
-import { KEY } from "./Constants";
+import { KEY,HumanState } from "./Constants";
 
-export enum HumanState{
-    stance=0,
-    running
-}
 
-///
-export default class Human extends Player{
+export class Human extends Player{
 
     constructor(scene:Phaser.Scene,x:number,y:number,targetX:number,targetY:number,title:string,alive:boolean,id:string,state:number){
         super(scene,x,y,targetX,targetY,KEY.human,title,alive,id,state);
@@ -28,7 +23,7 @@ export default class Human extends Player{
         }
         if(DISTANCE.magnitude<2 && this.state!=HumanState.stance){
             this.state=HumanState.stance;
-            console.log(this.id+" changed its state");
+            //console.log(this.id+" changed its state");
             user.room.send("Change-State",{id:this.id,state:this.state});
         }
     }

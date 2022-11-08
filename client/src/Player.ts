@@ -1,6 +1,10 @@
 import Phaser from "phaser";
-import { KEY } from "./Constants";
-import { HumanState } from "./Human";
+import { KEY,HumanState,ZombieState } from "./Constants";
+
+export enum PlayerType{
+    Human=0,
+    Zombie
+}
 export function Distance(x1:number,y1:number,x2:number,y2:number){
     const DELX=x2-x1;
     const DELY=y2-y1;
@@ -10,6 +14,7 @@ export function Distance(x1:number,y1:number,x2:number,y2:number){
     return {magnitude:MAGNITUDE,X:X,Y:Y,delX:DELX,delY:DELY};
 }
 export default class Player extends Phaser.GameObjects.Sprite{
+    playerType:PlayerType;
     walkSpeed:number; 
     inScene:boolean;
     titleObj:Phaser.GameObjects.Text;
@@ -67,24 +72,40 @@ export default class Player extends Phaser.GameObjects.Sprite{
     setAnim(){
         switch(this.state){
             case HumanState.stance:
-                this.animKey=KEY.stance;
+                this.animKey=KEY.H_stance;
                 break;
             case HumanState.running:
-                this.animKey=KEY.running;
+                this.animKey=KEY.H_running;
+                break;
+            case ZombieState.stance:
+                this.animKey=KEY.Z_stance;
+                break;
+            case ZombieState.lurch:
+                this.animKey=KEY.Z_lurch;
                 break;
         }
     }
     playAnim(){
-        if(this.state==HumanState.running && this.animKey!=KEY.running){
-            console.log(this.id+" run")
-            this.animKey=KEY.running;  
-            this.play(this.animKey);
-        }
-        if(this.state==HumanState.stance && this.animKey!=KEY.stance){
+        if(this.state==HumanState.stance && this.animKey!=KEY.H_stance){
             console.log(this.id+" stance")
-            this.animKey=KEY.stance;
+            this.animKey=KEY.H_stance;
             this.play(this.animKey);
             this.update()
+        }
+        if(this.state==HumanState.running && this.animKey!=KEY.H_running){
+            console.log(this.id+" run")
+            this.animKey=KEY.H_running;  
+            this.play(this.animKey);
+        }
+        if(this.state==ZombieState.stance && this.animKey!=KEY.Z_stance){
+            console.log(this.id+" zombie stance")
+            this.animKey=KEY.Z_stance;  
+            this.play(this.animKey);
+        }
+        if(this.state==ZombieState.lurch && this.animKey!=KEY.Z_lurch){
+            console.log(this.id+" zombie run")
+            this.animKey=KEY.Z_lurch;  
+            this.play(this.animKey);
         }
     }
     remove(){

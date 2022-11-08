@@ -1,7 +1,8 @@
 import { Room, Client, Deferred } from "colyseus";
 import MyRoomState from "./schema/MyRoomState";
 import { Human, HumanState} from "../Human";
-import PlayerSchema from "../PlayerSchema";
+import { Zombie, ZombieState } from "../Zombie";
+import PlayerSchema, { PlayerType } from "../PlayerSchema";
 
 export class MyRoom extends Room<MyRoomState>{
 
@@ -23,11 +24,21 @@ export class MyRoom extends Room<MyRoomState>{
     })
     this.onMessage("Pointer-Down",(client,mouseclick)=>{
       const player=this.state.players.get(client.id);
-      //console.log(player.state);
+      switch(player.type){
+        case PlayerType.Human:
+        {
+          player.state=HumanState.running;
+          break;
+        }
+        case PlayerType.Zombie:
+        {
+          player.state=ZombieState.lurch;
+          break;
+        }
+      }
       player.assign({
         targetX:mouseclick.x,
-        targetY:mouseclick.y,
-        state:HumanState.running
+        targetY:mouseclick.y
       })
     })
   }
@@ -37,6 +48,7 @@ export class MyRoom extends Room<MyRoomState>{
         console.log(client.id+"is now a Human.");       
         const human=new Human();
         human.assign({
+          type:PlayerType.Human,
           state:HumanState.stance,
           title:'title',
           alive:true,
@@ -49,12 +61,25 @@ export class MyRoom extends Room<MyRoomState>{
         });
         this.state.players.set(client.id,human);
     })
-    /*
+
+    
     this.onMessage("Assign-Zombie",(client,message)=>{
-      console.log(client.sessionId+"is now a Zombie.");
-      this.broadcast("create_zombie");
+      console.log(client.id+"is now a Zombie.");
+      const zombie=new Zombie();
+      zombie.assign({
+        type:PlayerType.Zombie,
+        state:ZombieState.stance,
+        title:"title",
+        alive:true,
+        id:client.id,
+        x:500,
+        y:300,
+        targetX:zombie.x,
+        targetY:zombie.y,
+        healthBarObj:'my_healthBar'
+      })
+      this.state.players.set(client.id,zombie);
     })
-    */
   }
 
   onLeave (client: Client, consented: boolean) {

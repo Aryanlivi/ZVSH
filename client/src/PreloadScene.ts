@@ -19,6 +19,14 @@ export default class PreloadScene extends Scene{
                 frameHeight: 128
             }
         });
+        this.load.spritesheet({
+            key: KEY.zombie,
+            url: require('./assets/zombie.png'),
+            frameConfig: {
+                frameWidth: 128,
+                frameHeight: 128
+            }
+        });
     }
     async create(){
         
@@ -36,14 +44,26 @@ export default class PreloadScene extends Scene{
 
     createAnims(){
         this.anims.create({
-            key: KEY.stance,
+            key: KEY.H_stance,
             frames: this.anims.generateFrameNumbers(KEY.human, { frames: [ 0, 1, 2, 3] }),
             frameRate: 4,
             repeat: -1
         });
         this.anims.create({
-            key: KEY.running,
+            key: KEY.H_running,
             frames: this.anims.generateFrameNumbers(KEY.human, { frames: [4, 5, 6, 7, 8, 9, 10, 11] }),
+            frameRate: 9,
+            repeat: -1
+        });
+        this.anims.create({
+            key: KEY.Z_stance,
+            frames: this.anims.generateFrameNumbers(KEY.zombie, { frames: [ 0, 1, 2, 3] }),
+            frameRate: 4,
+            repeat: -1
+        });
+        this.anims.create({
+            key: KEY.Z_lurch,
+            frames: this.anims.generateFrameNumbers(KEY.zombie, { frames: [4, 5, 6, 7, 8, 9, 10, 11]}),
             frameRate: 9,
             repeat: -1
         });
