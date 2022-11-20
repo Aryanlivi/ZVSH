@@ -7,16 +7,4 @@ export const KEY={
     zombie:"zombie",
     gamescene:"gamescene",
     preload:"preload",
-    H_stance:"hstance",
-    H_running:"hrunning",
-    Z_stance:"zstance",
-    Z_lurch:"zlurch"
-}
-export enum HumanState{
-    stance=0,
-    running
-}
-export enum ZombieState{
-    stance=2,
-    lurch
 }

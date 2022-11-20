@@ -1,9 +1,8 @@
 import { Room, Client, Deferred } from "colyseus";
 import MyRoomState from "./schema/MyRoomState";
-import { Human, HumanState} from "../Human";
-import { Zombie, ZombieState } from "../Zombie";
-import PlayerSchema, { PlayerType } from "../PlayerSchema";
-
+import { Human} from "../Human";
+import { Zombie } from "../Zombie";
+import PlayerSchema,{PlayerStates,PlayerType} from "../PlayerSchema";
 export class MyRoom extends Room<MyRoomState>{
 
   onCreate (options: any) {
@@ -27,12 +26,12 @@ export class MyRoom extends Room<MyRoomState>{
       switch(player.type){
         case PlayerType.Human:
         {
-          player.state=HumanState.running;
+          player.state=PlayerStates.running;
           break;
         }
         case PlayerType.Zombie:
         {
-          player.state=ZombieState.lurch;
+          player.state=PlayerStates.lurch;
           break;
         }
       }
@@ -49,7 +48,7 @@ export class MyRoom extends Room<MyRoomState>{
         const human=new Human();
         human.assign({
           type:PlayerType.Human,
-          state:HumanState.stance,
+          state:PlayerStates.stance,
           title:'title',
           alive:true,
           id:client.id,
@@ -68,7 +67,7 @@ export class MyRoom extends Room<MyRoomState>{
       const zombie=new Zombie();
       zombie.assign({
         type:PlayerType.Zombie,
-        state:ZombieState.stance,
+        state:PlayerStates.stance,
         title:"title",
         alive:true,
         id:client.id,

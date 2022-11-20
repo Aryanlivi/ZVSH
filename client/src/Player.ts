@@ -1,5 +1,6 @@
 import Phaser from "phaser";
-import { KEY,HumanState,ZombieState } from "./Constants";
+import { KEY } from "./Constants";
+import {PlayerStates} from "./services/PlayerSchema"
 
 export enum PlayerType{
     Human=0,
@@ -27,14 +28,21 @@ export default class Player extends Phaser.GameObjects.Sprite{
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
+    currAngle:number;
+    facingIndex:number;
+    oldFacingIndex:number;
+    facingPrefix:Array<string>;
     constructor(scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:number){
         super(scene,x,y,texture);
+        this.facingIndex=0;
+        this.oldFacingIndex=0;
+        this.facingPrefix=["l", "lu", "u", "ur", "r", "rd", "d", "dl"];
         this.inScene=false;
         this.state=state;
         this.title=title;
         this.alive=alive;
         this.id=id;
-        this.setAnim();
+        this.animKey="stance"
         this.targetX=targetX;
         this.targetY=targetY;
     }
@@ -42,7 +50,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.inScene=true;
         this.addTitle();
         this.addHealthBar();
-        this.play(this.animKey);
+        this.setPlayerAnim(this.animKey);
         this.scene.add.existing(this);
     }
     //for testing purposes
@@ -50,9 +58,13 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.circle=this.scene.add.graphics();
         this.circle.lineStyle(2, 0xff0000,1);
         const RADIUS = 2;
-        const TOP_CENTER=this.getTopCenter();
-        const OFFSET_Y=35;
-        this.circle.strokeCircle(TOP_CENTER.x, TOP_CENTER.y+OFFSET_Y, RADIUS);
+        const CENTER=this.getCenter();
+        //const OFFSET_Y=35;
+        this.circle.strokeCircle(CENTER.x, CENTER.y, RADIUS);
+        const line=this.scene.add.graphics();
+        line.lineStyle(2,0x000000,1);
+        const LINE_WIDTH=50;
+        line.strokeRect(CENTER.x-LINE_WIDTH/2, CENTER.y,LINE_WIDTH,1);
     }
 
     addTitle(): void {
@@ -69,44 +81,74 @@ export default class Player extends Phaser.GameObjects.Sprite{
     move(){
         return;
     }
-    setAnim(){
+    getCurrentAngle(angle:number){
+        angle=angle*(180/Math.PI);
+        if(angle<0){
+            angle+=360
+        }
+        return angle;
+    }
+    setEntityAngle(ang:number){
+        let currFacingIndex:number;
+        currFacingIndex=0;
+			
+			if (ang < 22.5 || ang > 337.5)
+			{ // right
+				currFacingIndex = 4;
+			}
+			else if (ang > 22.5 && ang < 67.5)
+			{ // right-down
+				currFacingIndex = 5;
+			}
+			else if (ang > 67.5 && ang < 112.5)
+			{ // down
+				currFacingIndex = 6;
+			}
+			else if (ang > 112.5 && ang < 157.5)
+			{ // left-down
+				currFacingIndex = 7;
+			}
+			else if (ang > 157.5 && ang < 202.5)
+			{ // left
+				currFacingIndex = 0;
+			}
+			else if (ang > 202.5 && ang < 247.5)
+			{ // left-up
+				currFacingIndex = 1;
+			}
+			else if (ang > 247.5 && ang < 292.5)
+			{ // up
+				currFacingIndex = 2;
+			}
+			else if (ang > 292.5 && ang < 337.5)
+			{ // right-up
+				currFacingIndex = 3;
+			}
+			this.facingIndex = currFacingIndex;
+    }
+    getPlayerAnim(){
         switch(this.state){
-            case HumanState.stance:
-                this.animKey=KEY.H_stance;
-                break;
-            case HumanState.running:
-                this.animKey=KEY.H_running;
-                break;
-            case ZombieState.stance:
-                this.animKey=KEY.Z_stance;
-                break;
-            case ZombieState.lurch:
-                this.animKey=KEY.Z_lurch;
-                break;
+            case PlayerStates.stance:
+                return "stance";
+            case PlayerStates.running:
+                return "running";
+            case PlayerStates.lurch:
+                return "lurch";
+            default:
+                return "stance";
         }
     }
-    playAnim(){
-        if(this.state==HumanState.stance && this.animKey!=KEY.H_stance){
-            console.log(this.id+" stance")
-            this.animKey=KEY.H_stance;
-            this.play(this.animKey);
-            this.update()
+    setPlayerAnim(newanimKey:string){
+        if (newanimKey == "attack")
+			{
+				newanimKey = "swing";
+			}
+        if(newanimKey!=this.animKey || this.oldFacingIndex!=this.facingIndex ){
+            this.play(this.facingPrefix[this.facingIndex]+"_"+newanimKey,false);
+            this.oldFacingIndex=this.facingIndex;
+            this.animKey=newanimKey;
         }
-        if(this.state==HumanState.running && this.animKey!=KEY.H_running){
-            console.log(this.id+" run")
-            this.animKey=KEY.H_running;  
-            this.play(this.animKey);
-        }
-        if(this.state==ZombieState.stance && this.animKey!=KEY.Z_stance){
-            console.log(this.id+" zombie stance")
-            this.animKey=KEY.Z_stance;  
-            this.play(this.animKey);
-        }
-        if(this.state==ZombieState.lurch && this.animKey!=KEY.Z_lurch){
-            console.log(this.id+" zombie run")
-            this.animKey=KEY.Z_lurch;  
-            this.play(this.animKey);
-        }
+        
     }
     remove(){
         this.healthBarObj.destroy();

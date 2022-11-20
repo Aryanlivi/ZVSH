@@ -3,7 +3,8 @@ import {user} from "./services/User";
 import { KEY } from "./Constants";
 import {listOfPlayers} from "./GlobalVar"
 import Player, { PlayerType } from "./Player";
-import PlayerSchema from "../../server//src/PlayerSchema"
+//"../../server//src/PlayerSchema"
+import PlayerSchema from "./services/PlayerSchema"
 //import Zombie  from "./Zombie";
 import {MapSchema} from "@colyseus/schema";
 import  {Human}  from "./Human";

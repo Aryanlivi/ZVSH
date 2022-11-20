@@ -2,6 +2,7 @@
 import {Scene} from "phaser";
 import {user} from "./services/User";
 import {KEY} from "./Constants"
+import { Human } from "./Human";
 export default class PreloadScene extends Scene{
     constructor(){
         super(KEY.preload);
@@ -32,8 +33,8 @@ export default class PreloadScene extends Scene{
         
         console.log("Pre-Loading..")
         /*
-            sprZombie.add("l_stance", [0, 1, 2, 3], 4, true);
-			sprZombie.add("l_running", [4, 5, 6, 7, 8, 9, 10, 11], 9, true);
+            Human.temp(this,"l_stance", [0, 1, 2, 3], 4, true);
+			Human.temp(this,"l_running", [4, 5, 6, 7, 8, 9, 10, 11], 9, true);
         */
         this.add.image(0,0,KEY.mockup).setOrigin(0,0);
         this.createAnims(); 
@@ -43,26 +44,15 @@ export default class PreloadScene extends Scene{
     }
 
     createAnims(){
+        Human.createAnims(this);
         this.anims.create({
-            key: KEY.H_stance,
-            frames: this.anims.generateFrameNumbers(KEY.human, { frames: [ 0, 1, 2, 3] }),
-            frameRate: 4,
-            repeat: -1
-        });
-        this.anims.create({
-            key: KEY.H_running,
-            frames: this.anims.generateFrameNumbers(KEY.human, { frames: [4, 5, 6, 7, 8, 9, 10, 11] }),
-            frameRate: 9,
-            repeat: -1
-        });
-        this.anims.create({
-            key: KEY.Z_stance,
+            key:"l_zstance",
             frames: this.anims.generateFrameNumbers(KEY.zombie, { frames: [ 0, 1, 2, 3] }),
             frameRate: 4,
             repeat: -1
         });
         this.anims.create({
-            key: KEY.Z_lurch,
+            key: "l_lurch",
             frames: this.anims.generateFrameNumbers(KEY.zombie, { frames: [4, 5, 6, 7, 8, 9, 10, 11]}),
             frameRate: 9,
             repeat: -1
