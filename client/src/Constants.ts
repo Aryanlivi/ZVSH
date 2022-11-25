@@ -5,6 +5,8 @@ export const KEY={
     gift:"gift",
     human:"human",
     zombie:"zombie",
-    gamescene:"gamescene",
+    gameScene:"game-scene",
     preload:"preload",
+    selectionScene:"selection-scene",
+    mag_glass:"magnifying-glass"
 }

@@ -25,6 +25,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
     animKey:string;
     healthBarTextureKey:string;
     healthBarObj:Phaser.GameObjects.Image;
+    MagnifyingGlassObj:Phaser.GameObjects.Image;
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
@@ -42,16 +43,33 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.title=title;
         this.alive=alive;
         this.id=id;
-        this.animKey="stance"
+        //this.animKey="stand"
         this.targetX=targetX;
         this.targetY=targetY;
     }
     addToScene(){
         this.inScene=true;
-        this.addTitle();
-        this.addHealthBar();
+        this.initTitle();
+        this.initHealthBar();
+        this.initMagnifyingGlass();
         this.setPlayerAnim(this.animKey);
         this.scene.add.existing(this);
+    }
+    initMagnifyingGlass(){
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET=40;
+        this.MagnifyingGlassObj=this.scene.add.image(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET,KEY.mag_glass);
+        this.MagnifyingGlassObj.setInteractive();
+        this.MagnifyingGlassObj.on("pointerdown",(pointer)=>{
+            if(pointer.leftButtonDown()){
+                console.log("provoked")
+            }
+        })
+    }
+    updateMagnifyingGlass(){
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET=40;
+        this.MagnifyingGlassObj.setPosition(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET)
     }
     //for testing purposes
     addcircle(){
@@ -67,17 +85,25 @@ export default class Player extends Phaser.GameObjects.Sprite{
         line.strokeRect(CENTER.x-LINE_WIDTH/2, CENTER.y,LINE_WIDTH,1);
     }
 
-    addTitle(): void {
+    initTitle(): void {
+        const TOP_CENTER=this.getTopCenter();
         const FONTFAMILY= 'Georgia, "Goudy Bookletter 1911", Times, serif';
-        this.titleObj=this.scene.add.text(this.getTopCenter().x,this.getTopCenter().y,this.id, { fontFamily:FONTFAMILY }).setOrigin(0.5,0)
+        this.titleObj=this.scene.add.text(TOP_CENTER.x,TOP_CENTER.y,this.id, { fontFamily:FONTFAMILY }).setOrigin(0.5,0)
     }
-
-    addHealthBar(){
+    updateTitle(){
+        const TOP_CENTER=this.getTopCenter();
+        this.titleObj.setPosition(TOP_CENTER.x,TOP_CENTER.y);
+    }
+    initHealthBar(){
         const TOP_CENTER=this.getTopCenter();
         const OFFSET_Y=35;
         this.healthBarObj=this.scene.add.image(TOP_CENTER.x,TOP_CENTER.y+OFFSET_Y,this.healthBarTextureKey);
     }
-
+    updateHealthBar(){
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET_Y=35;
+        this.healthBarObj.setPosition(TOP_CENTER.x,TOP_CENTER.y+OFFSET_Y);
+    }
     move(){
         return;
     }
@@ -151,12 +177,15 @@ export default class Player extends Phaser.GameObjects.Sprite{
         
     }
     remove(){
-        this.healthBarObj.destroy();
-        this.titleObj.destroy();
         this.destroy();
     }
     update(): void {
         return;
+    }
+    updateAttributes(){
+        this.updateHealthBar();
+        this.updateTitle();
+        this.updateMagnifyingGlass();
     }
 }
 

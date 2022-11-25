@@ -26,7 +26,6 @@ export class Human extends Player{
         });
     }
     static createAnims(scene:Phaser.Scene){
-        
         this.initAnims(scene,"l_stand", [0, 1, 2, 3], 4, true);
         this.initAnims(scene,"l_running", [4, 5, 6, 7, 8, 9, 10, 11], 9, true);
         this.initAnims(scene,"l_swing", [12, 13, 14, 15], 9, true);
@@ -113,10 +112,7 @@ export class Human extends Player{
     }
     update(){
         this.move();
-        //replace with new healthbar as u move
-        this.healthBarObj.destroy();
-        this.addHealthBar();
-        this.titleObj.destroy();
-        this.addTitle();
+        //replace with new healthbar as u move 
+        this.updateAttributes();
     }
 }

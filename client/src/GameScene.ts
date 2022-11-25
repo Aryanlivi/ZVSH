@@ -15,10 +15,10 @@ export default class GameScene extends Scene{
     //private listOfPlayers:Map<string,Player>=new Map();
     constructor(){
         //super takes in a key as arg to identify scene!
-        super(KEY.gamescene);
+        super(KEY.gameScene);
     }
     //---->Phaser Preload----//
-    preload(){ console.log(KEY.gamescene) } 
+    preload(){ console.log("In Game Scene") } 
     //---->Phaser Create----//
     create ()
     {
@@ -114,13 +114,11 @@ export default class GameScene extends Scene{
                     case PlayerType.Human:
                     {
                         player_instance=new Human(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
-                        console.log("human");
                         break;
                     }
                     case PlayerType.Zombie:
                         {
                             player_instance=new Zombie(this,player.x,player.y,player.targetX,player.targetY,player.title,player.alive,player.id,player.state);
-                            console.log("zombie");
                             break;
                         }
                 }

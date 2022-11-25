@@ -119,9 +119,6 @@ export class Zombie extends Player{
     update(){
         this.move();
         //replace with new healthbar as u move
-        this.healthBarObj.destroy();
-        this.addHealthBar();
-        this.titleObj.destroy();
-        this.addTitle();
+        this.updateAttributes();
     }
 }
