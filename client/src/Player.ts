@@ -84,7 +84,6 @@ export default class Player extends Phaser.GameObjects.Sprite{
         const LINE_WIDTH=50;
         line.strokeRect(CENTER.x-LINE_WIDTH/2, CENTER.y,LINE_WIDTH,1);
     }
-
     initTitle(): void {
         const TOP_CENTER=this.getTopCenter();
         const FONTFAMILY= 'Georgia, "Goudy Bookletter 1911", Times, serif';
@@ -177,6 +176,9 @@ export default class Player extends Phaser.GameObjects.Sprite{
         
     }
     remove(){
+        this.healthBarObj.destroy();
+        this.titleObj.destroy();
+        this.MagnifyingGlassObj.destroy();
         this.destroy();
     }
     update(): void {

@@ -4,7 +4,8 @@ class User{
     room:Room;
     id:string;
     constructor(){
-        this.client=new Client("ws://localhost:2567");
+        //Maitidevi:192.168.11.71
+        this.client=new Client("ws://192.168.11.71:2567");
     }
     async join(){
         console.log("Joining Room...");
