@@ -128,14 +128,14 @@ export default class Player extends Phaser.GameObjects.Sprite{
     }
     getPlayerAnim(){
         switch(this.state){
-            case PlayerStates.stance:
-                return "stance";
+            case PlayerStates.stand:
+                return "stand";
             case PlayerStates.running:
                 return "running";
             case PlayerStates.lurch:
                 return "lurch";
             default:
-                return "stance";
+                return "stand";
         }
     }
     setPlayerAnim(newanimKey:string){

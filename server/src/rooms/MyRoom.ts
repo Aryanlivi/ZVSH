@@ -48,7 +48,7 @@ export class MyRoom extends Room<MyRoomState>{
         const human=new Human();
         human.assign({
           type:PlayerType.Human,
-          state:PlayerStates.stance,
+          state:PlayerStates.stand,
           title:'title',
           alive:true,
           id:client.id,
@@ -67,7 +67,7 @@ export class MyRoom extends Room<MyRoomState>{
       const zombie=new Zombie();
       zombie.assign({
         type:PlayerType.Zombie,
-        state:PlayerStates.stance,
+        state:PlayerStates.stand,
         title:"title",
         alive:true,
         id:client.id,

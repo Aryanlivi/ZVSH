@@ -3,6 +3,7 @@ import {Scene} from "phaser";
 import {user} from "./services/User";
 import {KEY} from "./Constants"
 import { Human } from "./Human";
+import { Zombie } from "./Zombie";
 export default class PreloadScene extends Scene{
     constructor(){
         super(KEY.preload);
@@ -45,8 +46,10 @@ export default class PreloadScene extends Scene{
 
     createAnims(){
         Human.createAnims(this);
+        Zombie.createAnims(this);
+        /*
         this.anims.create({
-            key:"l_zstance",
+            key:"l_zstand",
             frames: this.anims.generateFrameNumbers(KEY.zombie, { frames: [ 0, 1, 2, 3] }),
             frameRate: 4,
             repeat: -1
@@ -57,6 +60,7 @@ export default class PreloadScene extends Scene{
             frameRate: 9,
             repeat: -1
         });
+        */
     }
     
     choosePlayer(){

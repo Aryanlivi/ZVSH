@@ -4,7 +4,7 @@ export enum PlayerType{
     Zombie
 }
 export enum PlayerStates{
-    stance=0,
+    stand=0,
     running,
     lurch
 }
