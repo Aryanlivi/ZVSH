@@ -109,7 +109,7 @@ export class Zombie extends Player{
             user.room.send("Change-State",{id:this.id,state:this.state});
             this.setPlayerAnim("lurch"+this.playerType);
         }
-        if(DISTANCE.magnitude<2 && this.state!=PlayerStates.stand){
+        if(DISTANCE.magnitude<2 && this.state==PlayerStates.lurch){
             this.state=PlayerStates.stand;
             this.setPlayerAnim("stand"+this.playerType);
             //console.log(this.id+" changed its state");
@@ -118,7 +118,7 @@ export class Zombie extends Player{
     }
     update(){
         this.move();
-        //replace with new healthbar as u move
-        this.updateAttributes();
+        this.updateHealthBar();
+        this.updateTitle();
     }
 }

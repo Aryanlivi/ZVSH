@@ -89,7 +89,19 @@ export class Human extends Player{
         this.initAnims(scene,"dl_die", [274, 275, 276, 277, 278, 279], 9, false);
         this.initAnims(scene,"dl_crit", [280, 281, 282, 283, 284, 285, 286, 287], 9, true);
     }
-
+    initMagnifyingGlass() {
+        const TOP_CENTER=this.getTopCenter();
+        const OFFSET=40;
+        this.MagnifyingGlassObj=this.scene.add.image(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET,KEY.mag_glass);
+        this.MagnifyingGlassObj.setInteractive();
+        this.MagnifyingGlassObj.on("pointerdown",(pointer)=>{
+            if(pointer.leftButtonDown()){
+                this.state=PlayerStates.attack;
+                user.room.send("Change-State",{id:this.id,state:this.state});
+                this.setPlayerAnim("swing"+this.playerType);
+            }
+        })
+    }
     move(){
         const DISTANCE=Distance(this.x,this.y,this.targetX,this.targetY);
         this.setEntityAngle(this.getCurrentAngle(this.currAngle));
@@ -103,7 +115,7 @@ export class Human extends Player{
             user.room.send("Change-State",{id:this.id,state:this.state});
             this.setPlayerAnim("running"+this.playerType);
         }
-        if(DISTANCE.magnitude<2 && this.state!=PlayerStates.stand){
+        if(DISTANCE.magnitude<2 && this.state==PlayerStates.running){
             this.state=PlayerStates.stand;
             this.setPlayerAnim("stand"+this.playerType);
             console.log(this.id+" changed its state");
@@ -112,7 +124,8 @@ export class Human extends Player{
     }
     update(){
         this.move();
-        //replace with new healthbar as u move 
-        this.updateAttributes();
+        this.updateHealthBar();
+        this.updateTitle();
+        this.updateMagnifyingGlass();
     }
 }

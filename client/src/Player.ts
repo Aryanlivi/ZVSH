@@ -56,15 +56,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.scene.add.existing(this);
     }
     initMagnifyingGlass(){
-        const TOP_CENTER=this.getTopCenter();
-        const OFFSET=40;
-        this.MagnifyingGlassObj=this.scene.add.image(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET,KEY.mag_glass);
-        this.MagnifyingGlassObj.setInteractive();
-        this.MagnifyingGlassObj.on("pointerdown",(pointer)=>{
-            if(pointer.leftButtonDown()){
-                console.log("provoked")
-            }
-        })
+        return;
     }
     updateMagnifyingGlass(){
         const TOP_CENTER=this.getTopCenter();
@@ -159,15 +151,13 @@ export default class Player extends Phaser.GameObjects.Sprite{
                 return "running";
             case PlayerStates.lurch:
                 return "lurch";
+            case PlayerStates.attack:
+                return "swing";
             default:
                 return "stand";
         }
     }
     setPlayerAnim(newanimKey:string){
-        if (newanimKey == "attack")
-			{
-				newanimKey = "swing";
-			}
         if(newanimKey!=this.animKey || this.oldFacingIndex!=this.facingIndex ){
             this.play(this.facingPrefix[this.facingIndex]+"_"+newanimKey,false);
             this.oldFacingIndex=this.facingIndex;

@@ -6,7 +6,8 @@ export enum PlayerType{
 export enum PlayerStates{
     stand=0,
     running,
-    lurch
+    lurch,
+    attack
 }
 export default class PlayerSchema extends Schema{
     @type("string") title:string;
