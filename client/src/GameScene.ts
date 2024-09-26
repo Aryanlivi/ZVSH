@@ -9,6 +9,7 @@ import PlayerSchema from "./services/PlayerSchema"
 import {MapSchema} from "@colyseus/schema";
 import  {Human}  from "./Human";
 import {Zombie} from "./Zombie";
+import { Gift } from "./Gift";
 
 //---->Main Game Scene----//
 export default class GameScene extends Scene{
@@ -23,7 +24,7 @@ export default class GameScene extends Scene{
     create ()
     {
         this.initMockup();
-        
+        this.initGift();
     }
 
     //---->initializes Mockup----//
@@ -41,7 +42,15 @@ export default class GameScene extends Scene{
             }
         })
     }
-
+    initGift(){
+        
+        const gift=new Gift(this);
+        gift.addToScene();
+    }
+    updateGift(){
+        const giftSchema=user.room.state.gift;
+        giftSchema.onChange=(changes)=>{console.log("ad")};
+    }
 //###------>Functions involving Player//
 
     //---->handles player updates----//
@@ -86,9 +95,11 @@ export default class GameScene extends Scene{
             if(!player.inScene){
                 if(player.id==user.id){
                     player.healthBarTextureKey='green_healthbar';
+                    player.isControlAllowed=true;
                 }
                 else{
                     player.healthBarTextureKey='red_healthbar'
+                    player.isControlAllowed=false;
                 }
                 player.addToScene();
             } 
@@ -141,5 +152,6 @@ export default class GameScene extends Scene{
     //--->MAIN GAME LOOP----//
     update(time: number, delta: number): void {
         this.handleChanges(delta);
+        this.updateGift();
     }
 }

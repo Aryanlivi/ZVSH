@@ -20,6 +20,7 @@ export class MyRoom extends Room<MyRoomState>{
     this.onMessage("Change-State",(client,message)=>{
       const player=this.state.players.get(message.id);
       player.state=message.state;
+      console.log(player.state);
     })
     this.onMessage("Pointer-Down",(client,mouseclick)=>{
       const player=this.state.players.get(client.id);
@@ -40,6 +41,12 @@ export class MyRoom extends Room<MyRoomState>{
         targetY:mouseclick.y
       })
     })
+    /*
+    this.onMessage("Gift-Added",(client,message)=>{
+        this.state.gift.isActive=message.isActive;
+        this.state.gift.x=message.x;
+        this.state.gift.y=message.y;
+    })*/
   }
   
   assignPlayer(){
@@ -90,5 +97,4 @@ export class MyRoom extends Room<MyRoomState>{
   onDispose() {
       console.log("room", this.roomId, "disposing...");
   }
-
 }

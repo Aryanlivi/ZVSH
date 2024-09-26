@@ -102,6 +102,16 @@ export class Human extends Player{
             }
         })
     }
+    updateMagnifyingGlass(): void {
+        if(this.state==PlayerStates.attack){
+            this.setPlayerAnim("swing"+this.playerType);
+        }
+        if(this.isControlAllowed){
+            const TOP_CENTER=this.getTopCenter();
+            const OFFSET=40;
+            this.MagnifyingGlassObj.setPosition(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET)
+        }
+    }
     move(){
         const DISTANCE=Distance(this.x,this.y,this.targetX,this.targetY);
         this.setEntityAngle(this.getCurrentAngle(this.currAngle));

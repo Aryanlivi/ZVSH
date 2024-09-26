@@ -26,6 +26,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
     healthBarTextureKey:string;
     healthBarObj:Phaser.GameObjects.Image;
     MagnifyingGlassObj:Phaser.GameObjects.Image;
+    isControlAllowed:boolean;
     circle:Phaser.GameObjects.Graphics;
     targetX:number;
     targetY:number;
@@ -33,7 +34,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
     facingIndex:number;
     oldFacingIndex:number;
     facingPrefix:Array<string>;
-    constructor(scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:number){
+    constructor(scene:Phaser.Scene,x:number,y:number,targetX:number,targetY:number,texture:string,title:string,alive:boolean,id:string,state:number){
         super(scene,x,y,texture);
         this.facingIndex=0;
         this.oldFacingIndex=0;
@@ -43,7 +44,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.title=title;
         this.alive=alive;
         this.id=id;
-        //this.animKey="stand"
+        this.animKey="stand";
         this.targetX=targetX;
         this.targetY=targetY;
     }
@@ -51,7 +52,10 @@ export default class Player extends Phaser.GameObjects.Sprite{
         this.inScene=true;
         this.initTitle();
         this.initHealthBar();
-        this.initMagnifyingGlass();
+        if(this.isControlAllowed){
+            this.initMagnifyingGlass();
+        }
+        console.log(this.animKey);
         this.setPlayerAnim(this.animKey);
         this.scene.add.existing(this);
     }
@@ -59,9 +63,7 @@ export default class Player extends Phaser.GameObjects.Sprite{
         return;
     }
     updateMagnifyingGlass(){
-        const TOP_CENTER=this.getTopCenter();
-        const OFFSET=40;
-        this.MagnifyingGlassObj.setPosition(TOP_CENTER.x+OFFSET,TOP_CENTER.y+OFFSET)
+        return;
     }
     //for testing purposes
     addcircle(){
@@ -173,11 +175,6 @@ export default class Player extends Phaser.GameObjects.Sprite{
     }
     update(): void {
         return;
-    }
-    updateAttributes(){
-        this.updateHealthBar();
-        this.updateTitle();
-        this.updateMagnifyingGlass();
     }
 }
 

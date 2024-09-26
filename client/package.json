@@ -6,7 +6,6 @@
   "dependencies": {
     "@colyseus/schema": "^1.0.44",
     "colyseus.js": "^0.14.13",
-    "parcel": "^2.8.0",
     "phaser": "^3.55.2"
   },
   "devDependencies": {
@@ -15,6 +14,8 @@
     "@typescript-eslint/eslint-plugin": "^5.42.0",
     "@typescript-eslint/parser": "^5.42.0",
     "eslint": "^8.26.0",
+    "parcel": "^2.12.0",
+    "process": "^0.11.10",
     "typescript": "^4.9.3"
   }
 }
