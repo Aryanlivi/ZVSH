@@ -1,5 +1,7 @@
 # Zombie vs. Humans Multiplayer Game
 
+![Alt text](images/zvsh.png)
+
 ## Overview
 This is a multiplayer game where players can choose to be either zombies or humans. Built using [Colyseus](https://colyseus.io/) for the server-side logic and [Pixi.js](https://pixijs.com/) for rendering graphics, the game supports real-time multiplayer interactions.
 
